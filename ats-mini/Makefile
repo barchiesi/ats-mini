@@ -48,7 +48,7 @@ help:
 build: $(ELF)
 
 $(ELF): $(INO) $(SRC) $(HEADERS)
-	$(ARDUINO_CLI) compile -e -p $(PROFILE) $(OPTIONS)
+	$(ARDUINO_CLI) compile -j 0 -e -p $(PROFILE) $(OPTIONS)
 
 upload: build
 	$(ARDUINO_CLI) upload -m $(PROFILE) -p $(PORT)
