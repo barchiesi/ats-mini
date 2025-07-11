@@ -16,3 +16,6 @@ __pycache__/
 
 # Project
 build/
+
+# JetBrains
+.idea
