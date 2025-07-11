@@ -60,7 +60,7 @@ jobs:
       - name: Get version slug
         id: slug
         run: |
-          echo "slug=$(git describe --tags --match 'v?.??' --always --dirty || echo v0.00)" >> "$GITHUB_OUTPUT"
+          echo "slug=$(git describe --tags --match 'v?.??d_????-??-??' --always --dirty || echo v0.00)" >> "$GITHUB_OUTPUT"
 
       - name: Compile firmware
         uses: arduino/compile-sketches@v1
@@ -110,7 +110,7 @@ jobs:
           path: artifact
 
   release:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && contains(github.ref, 'd') && contains(github.ref, '_') && contains(github.ref, '-')) }}
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -118,6 +118,12 @@ jobs:
     strategy:
       fail-fast: true
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          ref: "${{ github.event.inputs.revision || github.ref }}"
       - name: Download the build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -131,8 +137,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           SLUG: ${{ needs.build.outputs.slug }}
         run: >-
-          python -c 'import os,re; t=open(f"""artifact/ats-mini-{os.environ["SLUG"]}-ospi/CHANGELOG.md""").read(); r=re.search(f"""(^## {os.environ["SLUG"][1:].replace(".", "\\.")} .*?)(?=^## \\d|\\Z)""", t, re.MULTILINE | re.DOTALL); print(r.group(0) if r else "")' |
-          gh release create "$SLUG" --repo '${{ github.repository }}' --notes-file -
+          gh release create "$SLUG" --repo '${{ github.repository }}' --notes-file RELEASE_NOTES.md
       - name: Upload release artifacts
         env:
           GITHUB_TOKEN: ${{ github.token }}
