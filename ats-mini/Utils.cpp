@@ -34,7 +34,7 @@ const char *getVersion(bool shorter)
 {
   static char versionString[35] = "\0";
 
-  sprintf(versionString, "%s%sF/W: v%1.1d.%2.2d %s",
+  sprintf(versionString, "%s%sF/W: v%1.1d.%2.2dd %s",
     shorter ? "" : RECEIVER_NAME,
     shorter ? "" : " ",
     APP_VERSION / 100,
