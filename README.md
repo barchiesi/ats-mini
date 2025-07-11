@@ -1,4 +1,22 @@
-# ATS Mini
+# ATS Mini (webui patchset)
+
+> [!IMPORTANT]
+> This is a fork of [esp32-si4732/ats-mini](https://github.com/esp32-si4732/ats-mini) containing a patchset for a better web user interface (_by my standards - [barchiesi](https://github.com/barchiesi)_).
+>
+> The patchset includes the following:
+> * All radio information is available in the status web page and automatically refreshes every second;
+> * Volume and frequency can be changed from the web page;
+> * The memory web page automatically refreshes every 5 seconds;
+> * Memories can be tuned to from the web page;
+> * All settings can be changed in the config web page;
+> * [JSON Api](https://barchiesi.github.io/ats-mini/jsonapi.html) supporting all of the above (OpenAPI 3.0 spec [here](https://barchiesi.github.io/ats-mini/_static/dot-dot/openapi-schema.yml));
+> * Static web pages generation in firmware sources replaced by a dedicated _npm_ project which simplifies development and lowers the barrier of entry for new developers;
+>
+> [Releases](https://github.com/barchiesi/ats-mini/releases) follow the same versioning as upstream with a _d_ suffix. They contain everything upstream has plus the patchset in this fork.
+>
+> The intent of this patchset is to be upstreamed.
+>
+> The rest of this README is identical to upstream.
 
 ![](docs/source/_static/esp32-si4732-ui-theme.jpg)
 
