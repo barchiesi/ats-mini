@@ -9,7 +9,22 @@ A short video tutorial on how to build a custom firmware version:
 
 <iframe width="720" height="405" src="https://rutube.ru/play/embed/1ff6fc7246260b3d404acebd0435d785?p=faQjyf7QWhT3bff2GDrReQ" frameBorder="0" allow="clipboard-write; autoplay" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
 
-## Compiling the source code
+## Compiling the webui source code
+
+1. Install [Node.js](https://nodejs.org/en/download).
+2. Go to the repository _ats-mini-webui_ folder
+```shell
+cd ats-mini-webui
+```
+3. Run `npm install` to install the dependencies
+4. Build the webui
+```shell
+npm run build
+```
+
+Additional webui development information can be found in the _ats-mini-webui/README.md_ file.
+
+## Compiling the firmware source code
 
 1. Install [Arduino CLI](https://arduino.github.io/arduino-cli/1.2/installation/).
 2. Go to the repository root folder
