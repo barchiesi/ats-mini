@@ -17,6 +17,7 @@ on:
     #   - main
     paths:
       - 'ats-mini/**'
+      - 'ats-mini-webui/**'
       - 'changelog/**'
       - 'CHANGELOG.md'
       - '.github/workflows/build.yml'
@@ -61,6 +62,19 @@ jobs:
         id: slug
         run: |
           echo "slug=$(git describe --tags --match 'v?.??d' --always --dirty || echo v0.00)" >> "$GITHUB_OUTPUT"
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install webui npm dependencies
+        working-directory: ./ats-mini-webui
+        run: npm ci
+
+      - name: Build webui
+        working-directory: ./ats-mini-webui
+        run: npm run build
 
       - name: Compile firmware
         uses: arduino/compile-sketches@v1

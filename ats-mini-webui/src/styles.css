@@ -1,0 +1,46 @@
+BODY {
+  margin: 0;
+  padding: 0;
+}
+
+H1 {
+  text-align: center;
+}
+
+TABLE {
+  width: 100%;
+  max-width: 768px;
+  border: 0px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+TH, TD {
+  padding: 0.5em;
+}
+
+TH.HEADING {
+  background-color: #80A0FF;
+  column-span: all;
+  text-align: center;
+}
+
+TD.LABEL {
+  text-align: right;
+}
+
+INPUT[type=text],
+INPUT[type=password],
+SELECT {
+  width: 95%;
+  padding: 0.5em;
+}
+
+INPUT[type=submit] {
+  width: 50%;
+  padding: 0.5em 0;
+}
+
+.CENTER {
+  text-align: center;
+}

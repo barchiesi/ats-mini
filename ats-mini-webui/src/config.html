@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<HTML>
+<HEAD>
+    <META CHARSET='UTF-8'>
+    <META CONTENT='width=device-width, initial-scale=1.0' NAME='viewport'>
+    <TITLE>ATS-Mini Config</TITLE>
+    <link href="./styles.css" rel="stylesheet">
+</HEAD>
+<BODY STYLE='font-family: sans-serif;'>
+
+<H1>ATS-Mini Config</H1>
+<P ALIGN='CENTER'>
+    <A HREF='/'>Status</A>&nbsp;|&nbsp;<A HREF='/memory'>Memory</A>
+</P>
+<FORM id="configForm">
+    <TABLE COLUMNS=2>
+        <TR>
+            <TH CLASS='HEADING' COLSPAN=2>Login Credentials</TH>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Username</TD>
+            <TD>
+                <INPUT ID='username' NAME='username' TYPE='TEXT' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Password</TD>
+            <TD>
+                <INPUT ID='password' NAME='password' TYPE='PASSWORD' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TH CLASS='HEADING' COLSPAN=2>WiFi Network 1</TH>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>SSID</TD>
+            <TD>
+                <INPUT ID='wifissid1' NAME='wifissid1' TYPE='TEXT' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Password</TD>
+            <TD>
+                <INPUT ID='wifipass1' NAME='wifipass1' TYPE='PASSWORD' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TH CLASS='HEADING' COLSPAN=2>WiFi Network 2</TH>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>SSID</TD>
+            <TD>
+                <INPUT ID='wifissid2' NAME='wifissid2' TYPE='TEXT' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Password</TD>
+            <TD>
+                <INPUT ID='wifipass2' NAME='wifipass2' TYPE='PASSWORD' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TH CLASS='HEADING' COLSPAN=2>WiFi Network 3</TH>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>SSID</TD>
+            <TD>
+                <INPUT ID='wifissid3' NAME='wifissid3' TYPE='TEXT' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Password</TD>
+            <TD>
+                <INPUT ID='wifipass3' NAME='wifipass3' TYPE='PASSWORD' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TH CLASS='HEADING' COLSPAN=2>Settings</TH>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Time Zone</TD>
+            <TD>
+                <SELECT ID='utcoffset' NAME='utcoffset'></SELECT>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Theme</TD>
+            <TD>
+                <SELECT ID='theme' NAME='theme'></SELECT>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Reverse Scrolling</TD>
+            <TD>
+                <INPUT ID='scroll' NAME='scroll' TYPE='CHECKBOX' VALUE='on'>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Zoomed Menu</TD>
+            <TD>
+                <INPUT ID='zoom' NAME='zoom' TYPE='CHECKBOX' VALUE='on'>
+            </TD>
+        </TR>
+        <TR>
+            <TH CLASS='HEADING' COLSPAN=2>
+                <INPUT TYPE='SUBMIT' VALUE='Save'>
+            </TH>
+        </TR>
+    </TABLE>
+</FORM>
+<!-- Reenable once /writeeeprom stops breaking 30m band entry
+<FORM ACTION='/writeeeprom' METHOD='POST' ENCTYPE='multipart/form-data'>
+    <TABLE COLUMNS=2>
+        <TR>
+            <TD CLASS='CENTER' COLSPAN=2><A HREF='/ats-mini-eeprom.bin'>Download EEPROM Contents...</A></TD>
+            </TR>
+        <TR>
+            <TD CLASS='LABEL'>Upload EEPROM Contents</TD>
+            <TD><INPUT TYPE='FILE' NAME='eeprom' ACCEPT='.bin'></TD>
+        </TR>
+        <TR>
+            <TH COLSPAN=2 CLASS='HEADING'>
+                <INPUT TYPE='SUBMIT' VALUE='Write EEPROM'>
+            </TH>
+        </TR>
+    </TABLE>
+</FORM>
+-->
+<script src="./config.ts" type="module"></script>
+</BODY>
+</HTML>
