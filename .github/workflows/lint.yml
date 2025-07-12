@@ -17,3 +17,16 @@ jobs:
 
       - name: Pre-commit
         uses: pre-commit/action@v3.0.1
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install webui npm dependencies
+        working-directory: ./ats-mini-webui
+        run: npm ci
+
+      - name: Lint webui
+        working-directory: ./ats-mini-webui
+        run: npm run lint
