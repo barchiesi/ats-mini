@@ -1,0 +1,162 @@
+{
+  "themes": [
+    {
+      "id": 0,
+      "name": "Default"
+    },
+    {
+      "id": 1,
+      "name": "Bluesky"
+    },
+    {
+      "id": 2,
+      "name": "eInk"
+    },
+    {
+      "id": 3,
+      "name": "Pager"
+    },
+    {
+      "id": 4,
+      "name": "Orange"
+    },
+    {
+      "id": 5,
+      "name": "Night"
+    },
+    {
+      "id": 6,
+      "name": "Phosphor"
+    },
+    {
+      "id": 7,
+      "name": "Space"
+    },
+    {
+      "id": 8,
+      "name": "Magenta"
+    }
+  ],
+  "UTCOffsets": [
+    {
+      "id": 0,
+      "offset": -32,
+      "desc": "UTC-8",
+      "city": "Fairbanks"
+    },
+    {
+      "id": 1,
+      "offset": -28,
+      "desc": "UTC-7",
+      "city": "San Francisco"
+    },
+    {
+      "id": 2,
+      "offset": -24,
+      "desc": "UTC-6",
+      "city": "Denver"
+    },
+    {
+      "id": 3,
+      "offset": -20,
+      "desc": "UTC-5",
+      "city": "Houston"
+    },
+    {
+      "id": 4,
+      "offset": -16,
+      "desc": "UTC-4",
+      "city": "New York"
+    },
+    {
+      "id": 5,
+      "offset": -12,
+      "desc": "UTC-3",
+      "city": "Rio de Janeiro"
+    },
+    {
+      "id": 6,
+      "offset": -8,
+      "desc": "UTC-2",
+      "city": "Sandwich Islands"
+    },
+    {
+      "id": 7,
+      "offset": -4,
+      "desc": "UTC-1",
+      "city": "Nuuk"
+    },
+    {
+      "id": 8,
+      "offset": 0,
+      "desc": "UTC+0",
+      "city": "Reykjavik"
+    },
+    {
+      "id": 9,
+      "offset": 4,
+      "desc": "UTC+1",
+      "city": "London"
+    },
+    {
+      "id": 10,
+      "offset": 8,
+      "desc": "UTC+2",
+      "city": "Berlin"
+    },
+    {
+      "id": 11,
+      "offset": 12,
+      "desc": "UTC+3",
+      "city": "Moscow"
+    },
+    {
+      "id": 12,
+      "offset": 16,
+      "desc": "UTC+4",
+      "city": "Yerevan"
+    },
+    {
+      "id": 13,
+      "offset": 20,
+      "desc": "UTC+5",
+      "city": "Astana"
+    },
+    {
+      "id": 14,
+      "offset": 22,
+      "desc": "UTC+5:30",
+      "city": "Kolkata"
+    },
+    {
+      "id": 15,
+      "offset": 24,
+      "desc": "UTC+6",
+      "city": "Omsk"
+    },
+    {
+      "id": 16,
+      "offset": 28,
+      "desc": "UTC+7",
+      "city": "Novosibirsk"
+    },
+    {
+      "id": 17,
+      "offset": 32,
+      "desc": "UTC+8",
+      "city": "Beijing"
+    },
+    {
+      "id": 18,
+      "offset": 36,
+      "desc": "UTC+9",
+      "city": "Yakutsk"
+    },
+    {
+      "id": 19,
+      "offset": 40,
+      "desc": "UTC+10",
+      "city": "Vladivostok"
+    }
+  ]
+}

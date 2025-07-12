@@ -1,0 +1,12 @@
+{
+  "ip": "10.1.1.1",
+  "ssid": "ATS-Mini",
+  "mac": "98:A3:16:C1:DA:9C",
+  "version": "F/W: v2.28d Jul 27 2025",
+  "band": "VHF",
+  "freq": 94200000,
+  "mode": "FM",
+  "rssi": 44,
+  "snr": 20,
+  "battery": 3.878347
+}
