@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<HTML>
+<HEAD>
+    <META CHARSET='UTF-8'>
+    <META NAME='viewport' CONTENT='width=device-width, initial-scale=1.0'>
+    <TITLE>ATS-Mini Config</TITLE>
+    <link rel="stylesheet" href="./styles.css">
+</HEAD>
+<BODY STYLE='font-family: sans-serif;'>
+<H1>ATS-Mini Pocket Receiver</H1>
+<P ALIGN='CENTER'>
+    <A HREF='/memory'>Memory</A>&nbsp;|&nbsp;<A HREF='/config'>Config</A>
+</P>
+<TABLE COLUMNS=2>
+    <TR>
+        <TD CLASS='LABEL'>IP Address</TD>
+        <TD><A id="ip" HREF='/'></A> (<span id="ssid">ATS-Mini</span>)</TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>MAC Address</TD>
+        <TD id="mac"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Firmware</TD>
+        <TD id="version"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Band</TD>
+        <TD id="band"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Frequency</TD>
+        <TD id="frequency"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Signal Strength</TD>
+        <TD id="rssi"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Signal to Noise</TD>
+        <TD id="snr"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Battery Voltage</TD>
+        <TD id="battery"></TD>
+    </TR>
+</TABLE>
+<script type="module" src="./status.ts"></script>
+</BODY>
+</HTML>
