@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<HTML>
+<HEAD>
+    <META CHARSET='UTF-8'>
+    <META NAME='viewport' CONTENT='width=device-width, initial-scale=1.0'>
+    <TITLE>ATS-Mini Config</TITLE>
+    <link rel="stylesheet" href="./styles.css">
+</HEAD>
+<BODY STYLE='font-family: sans-serif;'>
+
+<H1>ATS-Mini Config</H1>
+<P ALIGN='CENTER'>
+    <A HREF='/'>Status</A>&nbsp;|&nbsp;<A HREF='/memory'>Memory</A>
+</P>
+<FORM ACTION='/setconfig' METHOD='POST'>
+    <TABLE COLUMNS=2>
+        <TR>
+            <TH COLSPAN=2 CLASS='HEADING'>Login Credentials</TH>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Username</TD>
+            <TD>
+                <INPUT TYPE='TEXT' NAME='username' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Password</TD>
+            <TD>
+                <INPUT TYPE='PASSWORD' NAME='password' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TH COLSPAN=2 CLASS='HEADING'>WiFi Network 1</TH>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>SSID</TD>
+            <TD>
+                <INPUT TYPE='TEXT' NAME='wifissid1' VALUE='H3140-65624654'>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Password</TD>
+            <TD>
+                <INPUT TYPE='PASSWORD' NAME='wifipass1' VALUE='6KbkQ527UP!'>
+            </TD>
+        </TR>
+        <TR>
+            <TH COLSPAN=2 CLASS='HEADING'>WiFi Network 2</TH>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>SSID</TD>
+            <TD>
+                <INPUT TYPE='TEXT' NAME='wifissid2' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Password</TD>
+            <TD>
+                <INPUT TYPE='PASSWORD' NAME='wifipass2' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TH COLSPAN=2 CLASS='HEADING'>WiFi Network 3</TH>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>SSID</TD>
+            <TD>
+                <INPUT TYPE='TEXT' NAME='wifissid3' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Password</TD>
+            <TD>
+                <INPUT TYPE='PASSWORD' NAME='wifipass3' VALUE=''>
+            </TD>
+        </TR>
+        <TR>
+            <TH COLSPAN=2 CLASS='HEADING'>Settings</TH>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Time Zone</TD>
+            <TD>
+                <SELECT NAME='utcoffset'>
+                    <OPTION VALUE='0'>Fairbanks (UTC-8)</OPTION>
+                    <OPTION VALUE='1'>San Francisco (UTC-7)</OPTION>
+                    <OPTION VALUE='2'>Denver (UTC-6)</OPTION>
+                    <OPTION VALUE='3'>Houston (UTC-5)</OPTION>
+                    <OPTION VALUE='4'>New York (UTC-4)</OPTION>
+                    <OPTION VALUE='5'>Rio de Janeiro (UTC-3)</OPTION>
+                    <OPTION VALUE='6'>Sandwich Islands (UTC-2)</OPTION>
+                    <OPTION VALUE='7'>Nuuk (UTC-1)</OPTION>
+                    <OPTION VALUE='8' SELECTED>Reykjavik (UTC+0)</OPTION>
+                    <OPTION VALUE='9'>London (UTC+1)</OPTION>
+                    <OPTION VALUE='10'>Berlin (UTC+2)</OPTION>
+                    <OPTION VALUE='11'>Moscow (UTC+3)</OPTION>
+                    <OPTION VALUE='12'>Yerevan (UTC+4)</OPTION>
+                    <OPTION VALUE='13'>Astana (UTC+5)</OPTION>
+                    <OPTION VALUE='14'>Kolkata (UTC+5:30)</OPTION>
+                    <OPTION VALUE='15'>Omsk (UTC+6)</OPTION>
+                    <OPTION VALUE='16'>Novosibirsk (UTC+7)</OPTION>
+                    <OPTION VALUE='17'>Beijing (UTC+8)</OPTION>
+                    <OPTION VALUE='18'>Yakutsk (UTC+9)</OPTION>
+                    <OPTION VALUE='19'>Vladivostok (UTC+10)</OPTION>
+                </SELECT>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Theme</TD>
+            <TD>
+                <SELECT NAME='theme'>
+                    <OPTION VALUE='0' SELECTED>Default</OPTION>
+                    <OPTION VALUE='1'>Bluesky</OPTION>
+                    <OPTION VALUE='2'>eInk</OPTION>
+                    <OPTION VALUE='3'>Pager</OPTION>
+                    <OPTION VALUE='4'>Orange</OPTION>
+                    <OPTION VALUE='5'>Night</OPTION>
+                    <OPTION VALUE='6'>Phosphor</OPTION>
+                    <OPTION VALUE='7'>Space</OPTION>
+                    <OPTION VALUE='8'>Magenta</OPTION>
+                </SELECT>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Reverse Scrolling</TD>
+            <TD>
+                <INPUT TYPE='CHECKBOX' NAME='scroll' VALUE='on'>
+            </TD>
+        </TR>
+        <TR>
+            <TD CLASS='LABEL'>Zoomed Menu</TD>
+            <TD>
+                <INPUT TYPE='CHECKBOX' NAME='zoom' VALUE='on'>
+            </TD>
+        </TR>
+        <TR>
+            <TH COLSPAN=2 CLASS='HEADING'>
+                <INPUT TYPE='SUBMIT' VALUE='Save'>
+            </TH>
+        </TR>
+    </TABLE>
+</FORM>
+
+</BODY>
+</HTML>
