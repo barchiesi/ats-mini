@@ -34,13 +34,14 @@ OPTIONS = \
 HEADERS = \
 	Common.h Themes.h Menu.h Storage.h tft_setup.h Rotary.h \
 	Utils.h Button.h EIBI.h SI4735-fixed.h patch_init.h \
-	WebApi.h
+	WebApi.h webui_dist.h WebUi.h
 
 SRC = \
 	$(INO) Utils.cpp Rotary.cpp Button.cpp Draw.cpp Menu.cpp \
 	Station.cpp Battery.cpp Storage.cpp Themes.cpp Remote.cpp \
 	Network.cpp EIBI.cpp Scan.cpp About.cpp Ble.cpp \
-	Layout-Default.cpp Layout-SMeter.cpp WebApi.cpp
+	Layout-Default.cpp Layout-SMeter.cpp WebApi.cpp webui_dist.cpp \
+	WebUi.cpp
 
 all: build
 
@@ -53,6 +54,12 @@ help:
 build: $(ELF)
 
 $(ELF): $(INO) $(SRC) $(HEADERS)
+	@if [ ! -f ../ats-mini-webui/dist/webui_dist.cpp ]; then \
+		echo "Warning: '../ats-mini-webui/dist/webui_dist.cpp' not found, webui was not built before building firmware!"; \
+	else \
+		cp ../ats-mini-webui/dist/webui_dist.cpp webui_dist.cpp; \
+		echo "Copied webui from built ats-mini-webui directory."; \
+	fi
 	$(ARDUINO_CLI) compile -j 0 -e -p $(PROFILE) $(OPTIONS)
 
 upload: build
