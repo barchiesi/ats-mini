@@ -76,6 +76,9 @@ jobs:
         working-directory: ./ats-mini-webui
         run: npm run build
 
+      - name: Copy built webui into firmware sources
+        run: cp ./ats-mini-webui/dist/webui_dist.cpp ./ats-mini
+
       - name: Compile firmware
         uses: arduino/compile-sketches@v1
         with:

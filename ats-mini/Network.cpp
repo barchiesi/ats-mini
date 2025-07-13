@@ -2,9 +2,9 @@
 #include "Storage.h"
 #include "Themes.h"
 #include "Utils.h"
-#include "Menu.h"
 #include "Draw.h"
 #include "WebApi.h"
+#include "WebUi.h"
 
 #include <WiFi.h>
 #include <WiFiUdp.h>
@@ -53,15 +53,6 @@ static void webInit();
 static void webSetConfig(AsyncWebServerRequest *request);
 static void webReadEEPROM(AsyncWebServerRequest *request);
 static void webWriteEEPROM(AsyncWebServerRequest *request, const String &filename, size_t index, uint8_t *data, size_t len, bool lastChunk);
-
-static const String webInputField(const String &name, const String &value, bool pass = false);
-static const String webStyleSheet();
-static const String webPage(const String &body);
-static const String webUtcOffsetSelector();
-static const String webThemeSelector();
-static const String webRadioPage();
-static const String webMemoryPage();
-static const String webConfigPage();
 
 //
 // Delayed WiFi connection
@@ -327,25 +318,6 @@ static bool wifiConnect()
 //
 static void webInit()
 {
-  server.on("/", HTTP_ANY, [] (AsyncWebServerRequest *request) {
-    request->send(200, "text/html", webRadioPage());
-  });
-
-  server.on("/memory", HTTP_ANY, [] (AsyncWebServerRequest *request) {
-    request->send(200, "text/html", webMemoryPage());
-  });
-
-  server.on("/config", HTTP_ANY, [] (AsyncWebServerRequest *request) {
-    if(loginUsername != "" && loginPassword != "")
-      if(!request->authenticate(loginUsername.c_str(), loginPassword.c_str()))
-        return request->requestAuthentication();
-    request->send(200, "text/html", webConfigPage());
-  });
-
-  server.onNotFound([] (AsyncWebServerRequest *request) {
-    request->send(404, "text/plain", "Not found");
-  });
-
   // This method saves configuration form contents
   server.on("/setconfig", HTTP_ANY, webSetConfig);
 
@@ -359,6 +331,11 @@ static void webInit()
   );
 
   addApiListeners(server);
+  addUiListeners(server);
+
+  server.onNotFound([] (AsyncWebServerRequest *request) {
+    request->send(404, "text/plain", "Not found");
+  });
 
   // Start web server
   server.begin();
@@ -470,317 +447,4 @@ static void webWriteEEPROM(AsyncWebServerRequest *request, const String &filenam
     else
       eepromStatus = "Wrote EEPROM";
   }
-}
-
-static const String webInputField(const String &name, const String &value, bool pass)
-{
-  String newValue(value);
-
-  newValue.replace("\"", "&quot;");
-  newValue.replace("'", "&apos;");
-
-  return(
-    "<INPUT TYPE='" + String(pass? "PASSWORD":"TEXT") + "' NAME='" +
-    name + "' VALUE='" + newValue + "'>"
-  );
-}
-
-static const String webStyleSheet()
-{
-  return
-"BODY"
-"{"
-  "margin: 0;"
-  "padding: 0;"
-"}"
-"H1"
-"{"
-  "text-align: center;"
-"}"
-"TABLE"
-"{"
-  "width: 100%;"
-  "max-width: 768px;"
-  "border: 0px;"
-  "margin-left: auto;"
-  "margin-right: auto;"
-"}"
-"TH, TD"
-"{"
-  "padding: 0.5em;"
-"}"
-"TH.HEADING"
-"{"
-  "background-color: #80A0FF;"
-  "column-span: all;"
-  "text-align: center;"
-"}"
-"TD.LABEL"
-"{"
-  "text-align: right;"
-"}"
-"INPUT[type=text], INPUT[type=password], SELECT"
-"{"
-  "width: 95%;"
-  "padding: 0.5em;"
-"}"
-"INPUT[type=submit]"
-"{"
-  "width: 50%;"
-  "padding: 0.5em 0;"
-"}"
-".CENTER"
-"{"
-  "text-align: center;"
-"}"
-;
-}
-
-static const String webPage(const String &body)
-{
-  return
-"<!DOCTYPE HTML>"
-"<HTML>"
-"<HEAD>"
-  "<META CHARSET='UTF-8'>"
-  "<META NAME='viewport' CONTENT='width=device-width, initial-scale=1.0'>"
-  "<TITLE>ATS-Mini Config</TITLE>"
-  "<STYLE>" + webStyleSheet() + "</STYLE>"
-"</HEAD>"
-"<BODY STYLE='font-family: sans-serif;'>" + body + "</BODY>"
-"</HTML>"
-;
-}
-
-static const String webUtcOffsetSelector()
-{
-  String result = "";
-
-  for(int i=0 ; i<getTotalUTCOffsets(); i++)
-  {
-    char text[64];
-
-    sprintf(text,
-      "<OPTION VALUE='%d'%s>%s (%s)</OPTION>",
-      i, utcOffsetIdx==i? " SELECTED":"",
-      utcOffsets[i].city, utcOffsets[i].desc
-    );
-
-    result += text;
-  }
-
-  return(result);
-}
-
-static const String webThemeSelector()
-{
-  String result = "";
-
-  for(int i=0 ; i<getTotalThemes(); i++)
-  {
-    char text[64];
-
-    sprintf(text,
-      "<OPTION VALUE='%d'%s>%s</OPTION>",
-       i, themeIdx==i? " SELECTED":"", theme[i].name
-    );
-
-    result += text;
-  }
-
-  return(result);
-}
-
-static const String webRadioPage()
-{
-  String ip = "";
-  String ssid = "";
-  String freq = currentMode == FM?
-    String(currentFrequency / 100.0) + "MHz "
-  : String(currentFrequency + currentBFO / 1000.0) + "kHz ";
-
-  if(WiFi.status()==WL_CONNECTED)
-  {
-    ip = WiFi.localIP().toString();
-    ssid = WiFi.SSID();
-  }
-  else
-  {
-    ip = WiFi.softAPIP().toString();
-    ssid = String(apSSID);
-  }
-
-  return webPage(
-"<H1>ATS-Mini Pocket Receiver</H1>"
-"<P ALIGN='CENTER'>"
-  "<A HREF='/memory'>Memory</A>&nbsp;|&nbsp;<A HREF='/config'>Config</A>"
-"</P>"
-"<TABLE COLUMNS=2>"
-"<TR>"
-  "<TD CLASS='LABEL'>IP Address</TD>"
-  "<TD><A HREF='http://" + ip + "'>" + ip + "</A> (" + ssid + ")</TD>"
-"</TR>"
-"<TR>"
-  "<TD CLASS='LABEL'>MAC Address</TD>"
-  "<TD>" + String(getMACAddress()) + "</TD>"
-"</TR>"
-"<TR>"
-  "<TD CLASS='LABEL'>Firmware</TD>"
-  "<TD>" + String(getVersion(true)) + "</TD>"
-"</TR>"
-"<TR>"
-  "<TD CLASS='LABEL'>Band</TD>"
-  "<TD>" + String(getCurrentBand()->bandName) + "</TD>"
-"</TR>"
-"<TR>"
-  "<TD CLASS='LABEL'>Frequency</TD>"
-  "<TD>" + freq + String(bandModeDesc[currentMode]) + "</TD>"
-"</TR>"
-"<TR>"
-  "<TD CLASS='LABEL'>Signal Strength</TD>"
-  "<TD>" + String(rssi) + "dBuV</TD>"
-"</TR>"
-"<TR>"
-  "<TD CLASS='LABEL'>Signal to Noise</TD>"
-  "<TD>" + String(snr) + "dB</TD>"
-"</TR>"
-"<TR>"
-  "<TD CLASS='LABEL'>Battery Voltage</TD>"
-  "<TD>" + String(batteryMonitor()) + "V</TD>"
-"</TR>"
-"</TABLE>"
-);
-}
-
-static const String webMemoryPage()
-{
-  String items = "";
-
-  for(int j=0 ; j<MEMORY_COUNT ; j++)
-  {
-    char text[64];
-    sprintf(text, "<TR><TD CLASS='LABEL' WIDTH='10%%'>%02d</TD><TD>", j+1);
-    items += text;
-
-    if(!memories[j].freq)
-      items += "&nbsp;---&nbsp;</TD></TR>";
-    else
-    {
-      String freq = memories[j].mode == FM?
-        String(memories[j].freq / 100.0) + "MHz "
-      : String(memories[j].freq + memories[j].hz100 / 10.0) + "kHz ";
-      items += freq + bandModeDesc[memories[j].mode] + "</TD></TR>";
-    }
-  }
-
-  return webPage(
-"<H1>ATS-Mini Pocket Receiver Memory</H1>"
-"<P ALIGN='CENTER'>"
-  "<A HREF='/'>Status</A>&nbsp;|&nbsp;<A HREF='/config'>Config</A>"
-"</P>"
-"<TABLE COLUMNS=2>" + items + "</TABLE>"
-);
-}
-
-const String webConfigPage()
-{
-  preferences.begin("configData", true);
-  String ssid1 = preferences.getString("wifissid1", "");
-  String pass1 = preferences.getString("wifipass1", "");
-  String ssid2 = preferences.getString("wifissid2", "");
-  String pass2 = preferences.getString("wifipass2", "");
-  String ssid3 = preferences.getString("wifissid3", "");
-  String pass3 = preferences.getString("wifipass3", "");
-  preferences.end();
-
-  return webPage(
-"<H1>ATS-Mini Config</H1>"
-"<P ALIGN='CENTER'>"
-  "<A HREF='/'>Status</A>"
-  "&nbsp;|&nbsp;<A HREF='/memory'>Memory</A>"
-"</P>"
-"<FORM ACTION='/setconfig' METHOD='POST'>"
-  "<TABLE COLUMNS=2>"
-  "<TR><TH COLSPAN=2 CLASS='HEADING'>Login Credentials</TH></TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>Username</TD>"
-    "<TD>" + webInputField("username", loginUsername) + "</TD>"
-  "</TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>Password</TD>"
-    "<TD>" + webInputField("password", loginPassword, true) + "</TD>"
-  "</TR>"
-  "<TR><TH COLSPAN=2 CLASS='HEADING'>WiFi Network 1</TH></TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>SSID</TD>"
-    "<TD>" + webInputField("wifissid1", ssid1) + "</TD>"
-  "</TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>Password</TD>"
-    "<TD>" + webInputField("wifipass1", pass1, true) + "</TD>"
-  "</TR>"
-  "<TR><TH COLSPAN=2 CLASS='HEADING'>WiFi Network 2</TH></TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>SSID</TD>"
-    "<TD>" + webInputField("wifissid2", ssid2) + "</TD>"
-  "</TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>Password</TD>"
-    "<TD>" + webInputField("wifipass2", pass2, true) + "</TD>"
-  "</TR>"
-  "<TR><TH COLSPAN=2 CLASS='HEADING'>WiFi Network 3</TH></TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>SSID</TD>"
-    "<TD>" + webInputField("wifissid3", ssid3) + "</TD>"
-  "</TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>Password</TD>"
-    "<TD>" + webInputField("wifipass3", pass3, true) + "</TD>"
-  "</TR>"
-  "<TR><TH COLSPAN=2 CLASS='HEADING'>Settings</TH></TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>Time Zone</TD>"
-    "<TD>"
-      "<SELECT NAME='utcoffset'>" + webUtcOffsetSelector() + "</SELECT>"
-    "</TD>"
-  "</TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>Theme</TD>"
-    "<TD>"
-      "<SELECT NAME='theme'>" + webThemeSelector() + "</SELECT>"
-    "</TD>"
-  "</TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>Reverse Scrolling</TD>"
-    "<TD><INPUT TYPE='CHECKBOX' NAME='scroll' VALUE='on'" +
-    (scrollDirection<0? " CHECKED ":"") + "></TD>"
-  "</TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>Zoomed Menu</TD>"
-    "<TD><INPUT TYPE='CHECKBOX' NAME='zoom' VALUE='on'" +
-    (zoomMenu? " CHECKED ":"") + "></TD>"
-  "</TR>"
-  "<TR><TH COLSPAN=2 CLASS='HEADING'>"
-    "<INPUT TYPE='SUBMIT' VALUE='Save'>"
-  "</TH></TR>"
-  "</TABLE>"
-"</FORM>"
-#if 0
-// @@@ Reenable once /writeeeprom stops breaking 30m band entry
-"<FORM ACTION='/writeeeprom' METHOD='POST' ENCTYPE='multipart/form-data'>"
-  "<TABLE COLUMNS=2>"
-  "<TR>"
-    "<TD CLASS='CENTER' COLSPAN=2><A HREF='/ats-mini-eeprom.bin'>Download EEPROM Contents...</A></TD>"
-  "</TR>"
-  "<TR>"
-    "<TD CLASS='LABEL'>Upload EEPROM Contents</TD>"
-    "<TD><INPUT TYPE='FILE' NAME='eeprom' ACCEPT='.bin'></TD>"
-  "</TR>"
-  "<TR><TH COLSPAN=2 CLASS='HEADING'>"
-    "<INPUT TYPE='SUBMIT' VALUE='Write EEPROM'>"
-  "</TH></TR>"
-  "</TABLE>"
-"</FORM>"
-#endif
-);
 }
