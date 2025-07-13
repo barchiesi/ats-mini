@@ -24,6 +24,12 @@ npm run build
 
 Additional webui development information can be found in the _ats-mini-webui/README.md_ file.
 
+## Adding the built webui to the firmware sources
+After building the webui sources in the previous section, copy the built `dist/webui_dist.cpp` file replacing the `ats-mini/webui_dist.cpp` file.
+```shell
+cp ./dist/webui_dist.cpp ../ats-mini/webui_dist.cpp
+```
+
 ## Compiling the firmware source code
 
 1. Install [Arduino CLI](https://arduino.github.io/arduino-cli/1.2/installation/).
@@ -55,7 +61,7 @@ arduino-cli compile --build-property "compiler.cpp.extra_flags=-DENABLE_HOLDOFF"
 
 ## Using the make command
 
-You can do all of the above using the `make` command as well:
+You can do all of the above (including copying the `webui_dist.cpp`) using the `make` command as well:
 
 ```shell
 ENABLE_HOLDOFF=1 PORT=/dev/tty.usbmodem14401 make upload
