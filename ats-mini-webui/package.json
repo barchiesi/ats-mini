@@ -5,7 +5,7 @@
     "dev": "vite",
     "dev-mock": "cross-env MOCK_API_MODE=1 vite",
     "lint": "eslint .",
-    "build": "vite build"
+    "build": "vite build && node scripts/generate-webui-dist.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
