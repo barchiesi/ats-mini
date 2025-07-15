@@ -81,9 +81,13 @@ typedef struct
 
 extern Band bands[];
 extern Memory memories[];
+extern const char *sleepModeDesc[];
 extern const UTCOffset utcOffsets[];
+extern const char *uiLayoutDesc[];
+extern const char *wifiModeDesc[];
 extern const char *bandModeDesc[];
 extern const FMRegion fmRegions[];
+extern const RDSMode rdsMode[];
 extern int bandIdx;
 
 // These are menu commands
@@ -113,10 +117,14 @@ int getFreqInputStep();
 const Step *getCurrentStep(bool fast = false);
 const Bandwidth *getCurrentBandwidth();
 uint8_t getRDSMode();
+int getTotalRDSModes();
 
+int getTotalSleepModes();
 int getCurrentUTCOffset();
 int getTotalUTCOffsets();
 int getTotalFmRegions();
+int getTotalUiLayouts();
+int getTotalWifiModes();
 int getTotalBleModes();
 
 void doSoftMute(int dir);

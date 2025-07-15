@@ -266,10 +266,17 @@ components:
         - wifipass2
         - wifissid3
         - wifipass3
-        - themeIdx
+        - brightness
+        - calibration
         - utcOffsetIdx
+        - rdsModeIdx
+        - fmRegionIdx
+        - themeIdx
+        - uiLayoutIdx
         - zoomMenu
         - scrollDirection
+        - sleepModeIdx
+        - wifiModeIdx
       properties:
         username:
           type: string
@@ -295,40 +302,80 @@ components:
         wifipass3:
           type: string
           example: ""
+        brightness:
+          type: number
+          example: 130
+        calibration:
+          type: number
+          example: 0
+        rdsModeIdx:
+          type: number
+          example: 6
         utcOffsetIdx:
           type: number
           example: 10
+        fmRegionIdx:
+          type: number
+          example: 0
         themeIdx:
           type: number
           example: 5
-        scrollDirection:
+        uiLayoutIdx:
           type: number
           example: 1
         zoomMenu:
           type: boolean
           example: false
+        scrollDirection:
+          type: number
+          example: 1
+          enum: [-1, 1]
+          description: "Scroll direction: -1 or 1"
+        sleepModeIdx:
+          type: number
+          example: 0
+        wifiModeIdx:
+          type: number
+          example: 3
 
     ConfigOptions:
       type: object
       required:
+        - rdsModes
         - UTCOffsets
+        - fmRegions
         - themes
+        - uiLayouts
+        - sleepModes
+        - wifiModes
       properties:
-        themes:
+        rdsModes:
           type: array
           items:
             type: object
+            required:
+              - id
+              - mode
+              - desc
             properties:
               id:
                 type: number
-                example: 1
-              name:
+                example: 3
+              mode:
+                type: number
+                example: 7
+              desc:
                 type: string
-                example: "Default"
+                example: "PS+PI+CT"
         UTCOffsets:
           type: array
           items:
             type: object
+            required:
+              - id
+              - offset
+              - desc
+              - city
             properties:
               id:
                 type: number
@@ -342,6 +389,80 @@ components:
               city:
                 type: string
                 example: "Houston"
+        fmRegions:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - value
+              - desc
+            properties:
+              id:
+                type: number
+                example: 0
+              value:
+                type: number
+                example: 1
+              desc:
+                type: string
+                example: "EU/JP/AU"
+        themes:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - name
+            properties:
+              id:
+                type: number
+                example: 1
+              name:
+                type: string
+                example: "Default"
+        uiLayouts:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - name
+            properties:
+              id:
+                type: number
+                example: 0
+              name:
+                type: string
+                example: "Default"
+        sleepModes:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - name
+            properties:
+              id:
+                type: number
+                example: 0
+              name:
+                type: string
+                example: "Locked"
+        wifiModes:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - name
+            properties:
+              id:
+                type: number
+                example: 3
+              name:
+                type: string
+                example: "Connect"
 
     Error:
       type: object

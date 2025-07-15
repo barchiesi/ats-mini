@@ -1,3 +1,13 @@
+export const debounce = (func: () => void, timeout = 300) => {
+  let timer: number;
+  return () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this);
+    }, timeout);
+  };
+}
+
 export const responseToJson = async (response: Response) => {
   if (!response.ok) {
     const errorText = await response.text();
@@ -33,6 +43,16 @@ export const populateSelect = (selectId: string, options: { value: string, label
     option.textContent = item.label;
     select.appendChild(option);
   })
+}
+
+export const syncValues = (src: string, dest: string) => {
+  const srcInput = document.getElementById(src) as HTMLInputElement;
+  const destSpan = document.getElementById(dest) as HTMLSpanElement;
+  if (srcInput && destSpan) {
+    srcInput.addEventListener('input', () => {
+      destSpan.textContent = srcInput.value;
+    });
+  }
 }
 
 export const formatFrequency = (frequency: number, mode: string = "AM"): string => {
