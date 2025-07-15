@@ -360,10 +360,16 @@ const String jsonConfig()
   config["wifipass2"] = pass2;
   config["wifissid3"] = ssid3;
   config["wifipass3"] = pass3;
+  config["brightness"] = currentBrt;
+  config["calibration"] = getCurrentBand()->bandCal;
+  config["rdsModeIdx"] = rdsModeIdx;
   config["utcOffsetIdx"] = utcOffsetIdx;
+  config["fmRegionIdx"] = FmRegionIdx;
   config["themeIdx"] = themeIdx;
-  config["scrollDirection"] = scrollDirection;
+  config["uiLayoutIdx"] = uiLayoutIdx;
   config["zoomMenu"] = zoomMenu;
+  config["scrollDirection"] = scrollDirection;
+  config["sleepModeIdx"] = sleepModeIdx;
 
   String json;
   serializeJson(doc, json);
@@ -409,6 +415,28 @@ void jsonSetConfig(JsonDocument request)
   // Done with the prefs
   prefs.end();
 
+  if(request["brightness"].is<int>())
+  {
+    currentBrt = request["brightness"];
+    if(!sleepOn()) ledcWrite(PIN_LCD_BL, currentBrt);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  if(request["calibration"].is<int>())
+  {
+    getCurrentBand()->bandCal = request["calibration"];
+    if(isSSB()) updateBFO(currentBFO, true);
+    prefsSave |= SAVE_CUR_BAND;
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  if(request["rdsModeIdx"].is<int>())
+  {
+    rdsModeIdx = request["rdsModeIdx"];
+    if(!(getRDSMode() & RDS_CT)) clockReset();
+    prefsSave |= SAVE_SETTINGS;
+  }
+
   // Save time zone
   if(request["utcOffsetIdx"].is<int>())
   {
@@ -417,10 +445,29 @@ void jsonSetConfig(JsonDocument request)
     prefsSave |= SAVE_SETTINGS;
   }
 
+  if(request["fmRegionIdx"].is<int>())
+  {
+    FmRegionIdx = request["fmRegionIdx"];
+    rx.setFMDeEmphasis(fmRegions[FmRegionIdx].value);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
   // Save theme
   if(request["themeIdx"].is<int>())
   {
     themeIdx = request["themeIdx"];
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  if(request["uiLayoutIdx"].is<int>())
+  {
+    uiLayoutIdx = request["uiLayoutIdx"];
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  if(request["zoomMenu"].is<bool>())
+  {
+    zoomMenu = request["zoomMenu"];
     prefsSave |= SAVE_SETTINGS;
   }
 
@@ -434,9 +481,9 @@ void jsonSetConfig(JsonDocument request)
     }
   }
 
-  if(request["zoomMenu"].is<bool>())
+  if(request["sleepModeIdx"].is<int>())
   {
-    zoomMenu = request["zoomMenu"];
+    sleepModeIdx = request["sleepModeIdx"];
     prefsSave |= SAVE_SETTINGS;
   }
 
@@ -453,12 +500,13 @@ const String jsonConfigOptions()
 {
   JsonDocument doc;
 
-  JsonArray themes = doc["themes"].to<JsonArray>();
-  for(int i = 0; i < getTotalThemes(); i++)
+  JsonArray rdsModes = doc["rdsModes"].to<JsonArray>();
+  for(int i = 0; i < getTotalRDSModes(); i++)
   {
-    JsonObject themeObj = themes.add<JsonObject>();
-    themeObj["id"] = i;
-    themeObj["name"] = theme[i].name;
+    JsonObject rdsModeObj = rdsModes.add<JsonObject>();
+    rdsModeObj["id"] = i;
+    rdsModeObj["mode"] = rdsMode[i].mode;
+    rdsModeObj["desc"] = rdsMode[i].desc;
   }
 
   JsonArray offsets = doc["UTCOffsets"].to<JsonArray>();
@@ -469,6 +517,39 @@ const String jsonConfigOptions()
     offsetObj["offset"] = utcOffsets[i].offset;
     offsetObj["desc"] = utcOffsets[i].desc;
     offsetObj["city"] = utcOffsets[i].city;
+  }
+
+  JsonArray fmRegionsJ = doc["fmRegions"].to<JsonArray>();
+  for(int i = 0; i < getTotalFmRegions(); i++)
+  {
+    JsonObject fmRegionObj = fmRegionsJ.add<JsonObject>();
+    fmRegionObj["id"] = i;
+    fmRegionObj["value"] = fmRegions[i].value;
+    fmRegionObj["desc"] = fmRegions[i].desc;
+  }
+
+  JsonArray themes = doc["themes"].to<JsonArray>();
+  for(int i = 0; i < getTotalThemes(); i++)
+  {
+    JsonObject themeObj = themes.add<JsonObject>();
+    themeObj["id"] = i;
+    themeObj["name"] = theme[i].name;
+  }
+
+  JsonArray uiLayouts = doc["uiLayouts"].to<JsonArray>();
+  for(int i = 0; i < getTotalUiLayouts(); i++)
+  {
+    JsonObject uiLayoutObj = uiLayouts.add<JsonObject>();
+    uiLayoutObj["id"] = i;
+    uiLayoutObj["name"] = uiLayoutDesc[i];
+  }
+
+  JsonArray sleepModes = doc["sleepModes"].to<JsonArray>();
+  for(int i = 0; i < getTotalSleepModes(); i++)
+  {
+    JsonObject sleepModeObj = sleepModes.add<JsonObject>();
+    sleepModeObj["id"] = i;
+    sleepModeObj["name"] = sleepModeDesc[i];
   }
 
   String json;

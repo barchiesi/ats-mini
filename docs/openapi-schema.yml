@@ -556,10 +556,16 @@ components:
         - wifipass2
         - wifissid3
         - wifipass3
+        - brightness
+        - calibration
         - utcOffsetIdx
+        - rdsModeIdx
+        - fmRegionIdx
         - themeIdx
-        - scrollDirection
+        - uiLayoutIdx
         - zoomMenu
+        - scrollDirection
+        - sleepModeIdx
       properties:
         username:
           type: string
@@ -593,22 +599,47 @@ components:
           type: string
           description: Third WiFi network password
           example: ""
+        brightness:
+          type: number
+          description: Display brightness level
+          example: 130
+        calibration:
+          type: number
+          description: Frequency calibration offset for current band
+          example: 0
+        rdsModeIdx:
+          type: number
+          description: RDS mode index (references rdsModes array from configOptions)
+          example: 6
         utcOffsetIdx:
           type: integer
           description: UTC offset index (references UTCOffsets array from configOptions)
           example: 8
+        fmRegionIdx:
+          type: number
+          description: FM region index (references fmRegions array from configOptions)
+          example: 0
         themeIdx:
           type: integer
           description: Theme index (references themes array from configOptions)
           example: 0
-        scrollDirection:
-          type: integer
-          description: Scroll direction (-1 or 1)
+        uiLayoutIdx:
+          type: number
           example: 1
+          description: UI layout index (references uiLayouts array from configOptions)
         zoomMenu:
           type: boolean
           description: Whether menu zoom is enabled
           example: false
+        scrollDirection:
+          type: integer
+          example: 1
+          enum: [-1, 1]
+          description: Scroll direction (-1 or 1)
+        sleepModeIdx:
+          type: number
+          description: Sleep mode index (references sleepModes array from configOptions)
+          example: 0
 
     ConfigUpdate:
       type: object
@@ -638,51 +669,98 @@ components:
         wifipass3:
           type: string
           description: Third WiFi network password
+        brightness:
+          type: number
+          description: Display brightness level
+        calibration:
+          type: number
+          description: Frequency calibration offset
+        rdsModeIdx:
+          type: number
+          description: RDS mode index
         utcOffsetIdx:
           type: integer
           description: UTC offset index
+        fmRegionIdx:
+          type: number
+          description: FM region index
         themeIdx:
           type: integer
           description: Theme index
+        uiLayoutIdx:
+          type: number
+          description: UI layout index
+        zoomMenu:
+          type: boolean
+          description: Menu zoom setting
         scrollDirection:
           type: integer
           description: Scroll direction (-1 or 1)
           enum: [-1, 1]
-        zoomMenu:
-          type: boolean
-          description: Zoom menu setting
+        sleepModeIdx:
+          type: number
+          description: Sleep mode index
 
     ConfigOptions:
       type: object
       required:
-        - themes
+        - rdsModes
         - UTCOffsets
+        - fmRegions
+        - themes
+        - uiLayouts
+        - sleepModes
       properties:
+        rdsModes:
+          type: array
+          description: Available RDS (Radio Data System) mode options
+          items:
+            $ref: '#/components/schemas/RdsMode'
+        UTCOffsets:
+          type: array
+          description: Available UTC time zone offsets
+          items:
+            $ref: '#/components/schemas/UTCOffset'
+        fmRegions:
+          type: array
+          description: Available FM region settings (affects de-emphasis and frequency ranges)
+          items:
+            $ref: '#/components/schemas/FmRegion'
         themes:
           type: array
           description: Available themes
           items:
             $ref: '#/components/schemas/Theme'
-        UTCOffsets:
+        uiLayouts:
           type: array
-          description: Available UTC offsets
+          description: Available UI layout options
           items:
-            $ref: '#/components/schemas/UTCOffset'
+            $ref: '#/components/schemas/UiLayout'
+        sleepModes:
+          type: array
+          description: Available device sleep mode options
+          items:
+            $ref: '#/components/schemas/SleepMode'
 
-    Theme:
+    RdsMode:
       type: object
       required:
         - id
-        - name
+        - mode
+        - desc
       properties:
         id:
-          type: integer
-          description: Theme index
-          example: 0
-        name:
+          type: number
+          description: RDS mode option index
+          example: 3
+        mode:
+          type: number
+          description: Internal RDS mode value/bitmask
+          example: 7
+        desc:
           type: string
-          description: Theme name
-          example: "Default"
+          description: Human-readable RDS mode description
+          example: "PS+PI+CT"
 
     UTCOffset:
       type: object
@@ -708,6 +786,71 @@ components:
           type: string
           description: Representative city
           example: "Fairbanks"
+
+    FmRegion:
+      type: object
+      required:
+        - id
+        - value
+        - desc
+      properties:
+        id:
+          type: number
+          description: FM region option index
+          example: 0
+        value:
+          type: number
+          description: Internal FM region value
+          example: 1
+        desc:
+          type: string
+          description: FM region description
+          example: "EU/JP/AU"
+
+    Theme:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          description: Theme index
+          example: 0
+        name:
+          type: string
+          description: Theme name
+          example: "Default"
+
+    UiLayout:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: number
+          description: UI layout index
+          example: 0
+        name:
+          type: string
+          description: UI layout name
+          example: "Default"
+
+    SleepMode:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: number
+          description: Sleep mode index
+          example: 0
+        name:
+          type: string
+          description: Sleep mode name
+          example: "Locked"
 
     Error:
       type: object

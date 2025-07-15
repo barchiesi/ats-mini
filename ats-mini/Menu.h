@@ -82,7 +82,9 @@ typedef struct
 
 extern Band bands[];
 extern Memory memories[];
+extern const char *sleepModeDesc[];
 extern const UTCOffset utcOffsets[];
+extern const char *uiLayoutDesc[];
 extern const Step fmSteps[];
 extern const Step ssbSteps[];
 extern const Step amSteps[];
@@ -91,6 +93,7 @@ extern const Bandwidth ssbBandwidths[];
 extern const Bandwidth amBandwidths[];
 extern const char *bandModeDesc[];
 extern const FMRegion fmRegions[];
+extern const RDSMode rdsMode[];
 extern int bandIdx;
 
 // These are menu commands
@@ -122,10 +125,13 @@ const Step *getCurrentStep(bool fast = false);
 int getLastBandwidth(int mode);
 const Bandwidth *getCurrentBandwidth();
 uint8_t getRDSMode();
+int getTotalRDSModes();
 
+int getTotalSleepModes();
 int getCurrentUTCOffset();
 int getTotalUTCOffsets();
 int getTotalFmRegions();
+int getTotalUiLayouts();
 int getTotalFmSteps();
 int getTotalSsbSteps();
 int getTotalAmSteps();
