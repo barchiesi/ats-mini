@@ -180,7 +180,7 @@ int getTotalMemories() { return(ITEM_COUNT(memories)); }
 //
 
 uint8_t rdsModeIdx = 0;
-static const RDSMode rdsMode[] =
+const RDSMode rdsMode[] =
 {
   { RDS_PS, "PS"},
   { RDS_PS | RDS_CT, "PS+CT" },
@@ -193,14 +193,17 @@ static const RDSMode rdsMode[] =
 };
 
 uint8_t getRDSMode() { return(rdsMode[rdsModeIdx].mode); }
+int getTotalRDSModes() { return(ITEM_COUNT(rdsMode)); }
 
 //
 // Sleep Mode Menu
 //
 
 uint8_t sleepModeIdx = SLEEP_LOCKED;
-static const char *sleepModeDesc[] =
+const char *sleepModeDesc[] =
 { "Locked", "Unlocked", "CPU Sleep" };
+
+int getTotalSleepModes() { return(ITEM_COUNT(sleepModeDesc)); }
 
 //
 // UTC Offset Menu
@@ -238,8 +241,9 @@ int getTotalUTCOffsets() { return(ITEM_COUNT(utcOffsets)); }
 // UI Layout Menu
 //
 uint8_t uiLayoutIdx = 0;
-static const char *uiLayoutDesc[] =
+const char *uiLayoutDesc[] =
 { "Default", "S-Meter" };
+int getTotalUiLayouts() { return(ITEM_COUNT(uiLayoutDesc)); }
 
 //
 // Bluetooth Mode Menu
