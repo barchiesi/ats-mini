@@ -1,3 +1,13 @@
+export const debounce = (func: () => void, timeout = 300) => {
+  let timer: number;
+  return () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this);
+    }, timeout);
+  };
+}
+
 export const responseToJson = async (response: Response) => {
   if (!response.ok) {
     const errorText = await response.text();
