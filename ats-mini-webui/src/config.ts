@@ -35,10 +35,17 @@ const saveConfig = () => {
     wifipass2: inputValue('wifipass2'),
     wifissid3: inputValue('wifissid3'),
     wifipass3: inputValue('wifipass3'),
+    brightness: parseInt(inputValue('brightness')),
+    calibration: parseInt(inputValue('calibration')),
+    rdsModeIdx: parseInt(inputValue('rdsModes')),
     utcOffsetIdx: parseInt(inputValue('utcoffset')),
+    fmRegionIdx: parseInt(inputValue('fmRegions')),
     themeIdx: parseInt(inputValue('theme')),
-    scrollDirection: checkboxValue('scroll') ? -1 : 1,
+    uiLayoutIdx: parseInt(inputValue('uiLayouts')),
     zoomMenu: checkboxValue('zoom'),
+    scrollDirection: checkboxValue('scroll') ? -1 : 1,
+    sleepModeIdx: parseInt(inputValue('sleepModes')),
+    wifiModeIdx: parseInt(inputValue('wifiModes')),
   };
 
   fetch('/api/config', {
@@ -66,10 +73,35 @@ const populateConfig = (config: Config) => {
   setInputValue('wifipass2', config.wifipass2);
   setInputValue('wifissid3', config.wifissid3);
   setInputValue('wifipass3', config.wifipass3);
+  setInputValue('wifipass3', config.wifipass3);
+  setInputValue('brightness', config.brightness.toString());
+
+  const brightnessValueSpan = document.getElementById('brightnessValue') as HTMLSpanElement;
+  if (brightnessValueSpan) brightnessValueSpan.textContent = config.brightness.toString();
+
+  setInputValue('calibration', config.calibration.toString());
+  const calibrationValueSpan = document.getElementById('calibrationValue') as HTMLSpanElement;
+  if (calibrationValueSpan) calibrationValueSpan.textContent = config.calibration.toString();
+
+  setInputValue('rdsModes', config.rdsModeIdx.toString());
   setInputValue('utcoffset', config.utcOffsetIdx.toString());
+  setInputValue('fmRegions', config.fmRegionIdx.toString());
   setInputValue('theme', config.themeIdx.toString());
-  setCheckboxValue('scroll', config.scrollDirection === -1);
+  setInputValue('uiLayouts', config.uiLayoutIdx.toString());
   setCheckboxValue('zoom', config.zoomMenu);
+  setCheckboxValue('scroll', config.scrollDirection === -1);
+  setInputValue('sleepModes', config.sleepModeIdx.toString());
+  setInputValue('wifiModes', config.wifiModeIdx.toString());
+}
+
+const syncValues = (src: string, dest: string) => {
+  const srcInput = document.getElementById(src) as HTMLInputElement;
+  const destSpan = document.getElementById(dest) as HTMLSpanElement;
+  if (srcInput && destSpan) {
+    srcInput.addEventListener('input', () => {
+      destSpan.textContent = srcInput.value;
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -81,6 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  syncValues('brightness', 'brightnessValue');
+  syncValues('calibration', 'calibrationValue');
+
   Promise.all([
     fetch('/api/configOptions')
       .then(responsetoJson),
@@ -88,11 +123,17 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(responsetoJson),
   ])
     .then(([configOptions, config]: [ConfigOptions, Config]) => {
+      populateSelect('rdsModes', configOptions.rdsModes.map(t => ({value: t.id.toString(), label: t.desc})));
       populateSelect('utcoffset', configOptions.UTCOffsets.map(o => ({
         value: o.id.toString(),
         label: `${o.city} (${o.desc})`
       })));
+      populateSelect('fmRegions', configOptions.fmRegions.map(t => ({value: t.id.toString(), label: t.desc})));
       populateSelect('theme', configOptions.themes.map(t => ({value: t.id.toString(), label: t.name})));
+      populateSelect('uiLayouts', configOptions.uiLayouts.map(t => ({value: t.id.toString(), label: t.name})));
+      populateSelect('sleepModes', configOptions.sleepModes.map(t => ({value: t.id.toString(), label: t.name})));
+      populateSelect('wifiModes', configOptions.wifiModes.map(t => ({value: t.id.toString(), label: t.name})));
+
       populateConfig(config);
     })
     .catch(error => {

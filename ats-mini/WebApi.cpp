@@ -154,10 +154,17 @@ const String jsonConfig()
   config["wifipass2"] = pass2;
   config["wifissid3"] = ssid3;
   config["wifipass3"] = pass3;
+  config["brightness"] = currentBrt;
+  config["calibration"] = getCurrentBand()->bandCal;
+  config["rdsModeIdx"] = rdsModeIdx;
   config["utcOffsetIdx"] = utcOffsetIdx;
+  config["fmRegionIdx"] = FmRegionIdx;
   config["themeIdx"] = themeIdx;
-  config["scrollDirection"] = scrollDirection;
+  config["uiLayoutIdx"] = uiLayoutIdx;
   config["zoomMenu"] = zoomMenu;
+  config["scrollDirection"] = scrollDirection;
+  config["sleepModeIdx"] = sleepModeIdx;
+  config["wifiModeIdx"] = wifiModeIdx;
 
   String json;
   serializeJson(doc, json);
@@ -203,6 +210,26 @@ void jsonSetConfig(JsonDocument request)
   // Done with the storedPrefs
   storedPrefs.end();
 
+  if(request["brightness"].is<int>())
+  {
+    currentBrt = request["brightness"];
+    if(!sleepOn()) ledcWrite(PIN_LCD_BL, currentBrt);
+    eepromSave = true;
+  }
+
+  if(request["calibration"].is<int>())
+  {
+    getCurrentBand()->bandCal = request["calibration"];
+    if(isSSB()) updateBFO(currentBFO, true);
+    eepromSave = true;
+  }
+
+  if(request["rdsModeIdx"].is<int>())
+  {
+    rdsModeIdx = request["rdsModeIdx"];
+    eepromSave = true;
+  }
+
   // Save time zone
   if(request["utcOffsetIdx"].is<int>())
   {
@@ -211,10 +238,29 @@ void jsonSetConfig(JsonDocument request)
     eepromSave = true;
   }
 
+  if(request["fmRegionIdx"].is<int>())
+  {
+    FmRegionIdx = request["fmRegionIdx"];
+    rx.setFMDeEmphasis(fmRegions[FmRegionIdx].value);
+    eepromSave = true;
+  }
+
   // Save theme
   if(request["themeIdx"].is<int>())
   {
     themeIdx = request["themeIdx"];
+    eepromSave = true;
+  }
+
+  if(request["uiLayoutIdx"].is<int>())
+  {
+    uiLayoutIdx = request["uiLayoutIdx"];
+    eepromSave = true;
+  }
+
+  if(request["zoomMenu"].is<bool>())
+  {
+    zoomMenu = request["zoomMenu"];
     eepromSave = true;
   }
 
@@ -228,9 +274,15 @@ void jsonSetConfig(JsonDocument request)
     }
   }
 
-  if(request["zoomMenu"].is<bool>())
+  if(request["sleepModeIdx"].is<int>())
   {
-    zoomMenu = request["zoomMenu"];
+    sleepModeIdx = request["sleepModeIdx"];
+    eepromSave = true;
+  }
+
+  if(request["wifiModeIdx"].is<int>())
+  {
+    wifiModeIdx = request["wifiModeIdx"];
     eepromSave = true;
   }
 
@@ -247,12 +299,13 @@ const String jsonConfigOptions()
 {
   JsonDocument doc;
 
-  JsonArray themes = doc["themes"].to<JsonArray>();
-  for(int i = 0; i < getTotalThemes(); i++)
+  JsonArray rdsModes = doc["rdsModes"].to<JsonArray>();
+  for(int i = 0; i < getTotalRDSModes(); i++)
   {
-    JsonObject themeObj = themes.add<JsonObject>();
-    themeObj["id"] = i;
-    themeObj["name"] = theme[i].name;
+    JsonObject rdsModeObj = rdsModes.add<JsonObject>();
+    rdsModeObj["id"] = i;
+    rdsModeObj["mode"] = rdsMode[i].mode;
+    rdsModeObj["desc"] = rdsMode[i].desc;
   }
 
   JsonArray offsets = doc["UTCOffsets"].to<JsonArray>();
@@ -263,6 +316,47 @@ const String jsonConfigOptions()
     offsetObj["offset"] = utcOffsets[i].offset;
     offsetObj["desc"] = utcOffsets[i].desc;
     offsetObj["city"] = utcOffsets[i].city;
+  }
+
+  JsonArray fmRegionsJ = doc["fmRegions"].to<JsonArray>();
+  for(int i = 0; i < getTotalFmRegions(); i++)
+  {
+    JsonObject fmRegionObj = fmRegionsJ.add<JsonObject>();
+    fmRegionObj["id"] = i;
+    fmRegionObj["value"] = fmRegions[i].value;
+    fmRegionObj["desc"] = fmRegions[i].desc;
+  }
+
+  JsonArray themes = doc["themes"].to<JsonArray>();
+  for(int i = 0; i < getTotalThemes(); i++)
+  {
+    JsonObject themeObj = themes.add<JsonObject>();
+    themeObj["id"] = i;
+    themeObj["name"] = theme[i].name;
+  }
+
+  JsonArray uiLayouts = doc["uiLayouts"].to<JsonArray>();
+  for(int i = 0; i < getTotalUiLayouts(); i++)
+  {
+    JsonObject uiLayoutObj = uiLayouts.add<JsonObject>();
+    uiLayoutObj["id"] = i;
+    uiLayoutObj["name"] = uiLayoutDesc[i];
+  }
+
+  JsonArray sleepModes = doc["sleepModes"].to<JsonArray>();
+  for(int i = 0; i < getTotalSleepModes(); i++)
+  {
+    JsonObject sleepModeObj = sleepModes.add<JsonObject>();
+    sleepModeObj["id"] = i;
+    sleepModeObj["name"] = sleepModeDesc[i];
+  }
+
+  JsonArray wifiModes = doc["wifiModes"].to<JsonArray>();
+  for(int i = 0; i < getTotalWifiModes(); i++)
+  {
+    JsonObject wifiModeObj = wifiModes.add<JsonObject>();
+    wifiModeObj["id"] = i;
+    wifiModeObj["name"] = wifiModeDesc[i];
   }
 
   String json;
