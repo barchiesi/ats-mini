@@ -147,6 +147,11 @@ components:
         - rssi
         - snr
         - battery
+        - step
+        - bandwidth
+        - agc
+        - volume
+        - softMuteMaxAttIdx
       properties:
         ip:
           type: string
@@ -179,6 +184,57 @@ components:
         battery:
           type: number
           example: 3.69197
+        step:
+          type: string
+          example: "100k"
+        bandwidth:
+          type: string
+          example: "Auto"
+        agc:
+          type: boolean
+          example: false
+        attenuation:
+          type: number
+          example: 10
+          description: "Only present when agc off"
+        time:
+          type: string
+          example: "15:49"
+          description: "Only present when clock time is available"
+        volume:
+          type: number
+          example: 50
+        squelch:
+          type: number
+          example: 7
+          description: "Only present if squelch is enabled"
+        softMuteMaxAttIdx:
+          type: number
+          example: 4
+        avc:
+          type: number
+          example: 10
+          description: "Present for SSB and non-FM modes, not present for FM"
+        rds:
+          type: object
+          description: "Only present for FM"
+          properties:
+            piCode:
+              type: string
+              example: "5241"
+              description: "Hexadecimal string, only present when station code is available"
+            stationName:
+              type: string
+              example: " VIRGIN "
+              description: "Only present when station name is available"
+            radioText:
+              type: string
+              example: "In onda MGK con CLICHE'"
+              description: "Only present when radio text is available"
+            programInfo:
+              type: string
+              example: "Rock Music"
+              description: "Only present when program info is available"
 
     Memory:
       type: object
