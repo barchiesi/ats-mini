@@ -264,7 +264,7 @@ static const char *wifiModeDesc[] =
 //
 
 // FM (kHz * 10)
-static const Step fmSteps[] =
+const Step fmSteps[] =
 {
   {   1, "10k",   1 },
   {   5, "50k",   5 },
@@ -272,6 +272,7 @@ static const Step fmSteps[] =
   {  20, "200k", 20 },
   { 100, "1M",   10 },
 };
+int getTotalFmSteps() { return(ITEM_COUNT(fmSteps)); }
 
 static const uint8_t fmFastSteps[] =
 {
@@ -283,7 +284,7 @@ static const uint8_t fmFastSteps[] =
 };
 
 // SSB (Hz)
-static const Step ssbSteps[] =
+const Step ssbSteps[] =
 {
   {    10, "10",  1  },
   {    25, "25",  1  },
@@ -295,6 +296,7 @@ static const Step ssbSteps[] =
   {  9000, "9k",  9  },
   { 10000, "10k", 10 },
 };
+int getTotalSsbSteps() { return(ITEM_COUNT(ssbSteps)); }
 
 static const uint8_t ssbFastSteps[] =
 {
@@ -310,7 +312,7 @@ static const uint8_t ssbFastSteps[] =
 };
 
 // AM (kHz)
-static const Step amSteps[] =
+const Step amSteps[] =
 {
   {    1, "1k",    1 },
   {    5, "5k",    5 },
@@ -320,6 +322,7 @@ static const Step amSteps[] =
   {  100, "100k", 10 },
   { 1000, "1M",   10 },
 };
+int getTotalAmSteps() { return(ITEM_COUNT(amSteps)); }
 
 static const uint8_t amFastSteps[] =
 {
@@ -393,7 +396,7 @@ static uint8_t getMaxFreqInputPos()
 // Bandwidth Menu
 //
 
-static const Bandwidth fmBandwidths[] =
+const Bandwidth fmBandwidths[] =
 {
   { 0, "Auto" }, // Automatic - default
   { 1, "110k" }, // Force wide (110 kHz) channel filter.
@@ -401,8 +404,9 @@ static const Bandwidth fmBandwidths[] =
   { 3, "60k"  },
   { 4, "40k"  }
 };
+int getTotalFmBandwidths() { return(ITEM_COUNT(fmBandwidths)); }
 
-static const Bandwidth ssbBandwidths[] =
+const Bandwidth ssbBandwidths[] =
 {
   { 4, "0.5k" },
   { 5, "1.0k" },
@@ -411,8 +415,9 @@ static const Bandwidth ssbBandwidths[] =
   { 2, "3.0k" },
   { 3, "4.0k" }
 };
+int getTotalSsbBandwidths() { return(ITEM_COUNT(ssbBandwidths)); }
 
-static const Bandwidth amBandwidths[] =
+const Bandwidth amBandwidths[] =
 {
   { 4, "1.0k" },
   { 5, "1.8k" },
@@ -422,6 +427,7 @@ static const Bandwidth amBandwidths[] =
   { 1, "4.0k" },
   { 0, "6.0k" }
 };
+int getTotalAmBandwidths() { return(ITEM_COUNT(amBandwidths)); }
 
 static const Bandwidth *bandwidths[4] =
 {
