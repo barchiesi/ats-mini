@@ -161,6 +161,11 @@ components:
         - rssi
         - snr
         - battery
+        - step
+        - bandwidth
+        - agc
+        - volume
+        - softMuteMaxAttIdx
       properties:
         ip:
           type: string
@@ -203,6 +208,62 @@ components:
           format: float
           description: Battery voltage in volts
           example: 3.878347
+        step:
+          type: string
+          description: Frequency step size
+          example: "100k"
+        bandwidth:
+          type: string
+          description: Current bandwidth setting
+          example: "Auto"
+        agc:
+          type: boolean
+          description: Automatic Gain Control status (true when AGC is enabled)
+          example: false
+        attenuation:
+          type: number
+          description: Manual attenuation level (only present when AGC is disabled)
+          example: 10
+        time:
+          type: string
+          description: Current time in HH:MM format (only present when clock is available)"
+          example: "15:49"
+        volume:
+          type: number
+          description: Current volume level
+          example: 50
+        squelch:
+          type: number
+          description: Current squelch level (only present when squelch is enabled)"
+          example: 7
+        softMuteMaxAttIdx:
+          type: number
+          description: Soft mute maximum attenuation index
+          example: 4
+        avc:
+          type: number
+          description: Automatic Volume Control setting (present for SSB and non-FM modes, not present for FM)
+          example: 10
+        rds:
+          type: object
+          description: RDS (Radio Data System) information (only present in FM mode)"
+          properties:
+            piCode:
+              type: string
+              description: Program Identification code in hexadecimal (only present when available)
+              example: "5241"
+            stationName:
+              type: string
+              description: Station name from RDS PS (Program Service) data (only present when available)
+              example: " VIRGIN "
+            radioText:
+              type: string
+              example: "In onda MGK con CLICHE'"
+              description: Radio text from RDS RT (Radio Text) data (only present when available)
+            programInfo:
+              type: string
+              description: Program type information from RDS PTY (Program Type) data (only present when available)
+              example: "Rock Music"
 
     Memory:
       type: object
