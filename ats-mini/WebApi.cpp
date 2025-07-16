@@ -38,6 +38,63 @@ static const String jsonStatus()
   root["rssi"] = rssi;
   root["snr"] = snr;
   root["battery"] = batteryMonitor();
+  root["step"] = getCurrentStep()->desc;
+  root["bandwidth"] = getCurrentBandwidth()->desc;
+  root["agc"] = !agcNdx && !agcIdx;
+  if (agcIdx)
+  {
+    root["attenuation"] = agcNdx;
+  }
+  const char *time = clockGet();
+  if (time)
+  {
+    root["time"] = time;
+  }
+  root["volume"] = volume;
+  root["squelch"] = currentSquelch;
+  if(currentMode != FM)
+  {
+    root["softMuteMaxAttIdx"] = softMuteMaxAttIdx;
+  }
+  if(isSSB())
+  {
+    root["avc"] = SsbAvcIdx;
+  }
+  else if(currentMode != FM)
+  {
+    root["avc"] = AmAvcIdx;
+  }
+
+  if(currentMode == FM)
+  {
+    JsonObject rds = root["rds"].to<JsonObject>();
+    uint16_t piCode = getRdsPiCode();
+    if (piCode)
+    {
+      rds["piCode"] = String(piCode, HEX);
+    }
+    String stationName = getStationName();
+    if (stationName != "")
+    {
+      rds["stationName"] = stationName;
+    }
+
+    String radioText = "";
+    const char *rt = getRadioText();
+    for(; *rt; rt+=strlen(rt)+1) {
+      radioText += String(rt) + " ";
+    }
+    if (radioText != "")
+    {
+      rds["radioText"] = radioText;
+    }
+
+    String programInfo = getProgramInfo();
+    if (programInfo != "")
+    {
+      rds["programInfo"] = programInfo;
+    }
+  }
 
   String json;
   serializeJson(doc, json);
