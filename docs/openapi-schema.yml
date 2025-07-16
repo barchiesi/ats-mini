@@ -162,6 +162,48 @@ components:
         battery:
           type: number
           example: 3.69197
+        step:
+          type: string
+          example: "100k"
+        bandwidth:
+          type: string
+          example: "Auto"
+        agc:
+          type: boolean
+          example: false
+        attenuation:
+          type: number
+          example: 10
+        time:
+          type: string
+          example: "15:49"
+        volume:
+          type: number
+          example: 50
+        squelch:
+          type: number
+          example: 7
+        softMuteMaxAttIdx:
+          type: number
+          example: 4
+        avc:
+          type: number
+          example: 10
+        rds:
+          type: object
+          properties:
+            piCode:
+              type: string
+              example: "5241"
+            stationName:
+              type: string
+              example: " VIRGIN "
+            radioText:
+              type: string
+              example: "In onda MGK con CLICHE'"
+            programInfo:
+              type: string
+              example: "Rock Music"
 
     Memory:
       type: object
