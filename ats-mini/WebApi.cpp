@@ -32,12 +32,157 @@ const String jsonStatus()
   root["ssid"] = ssid;
   root["mac"] = getMACAddress();
   root["version"] = getVersion(true);
-  root["band"] = getCurrentBand()->bandName;
+  root["bandIdx"] = bandIdx;
   root["freq"] = freqToHz(currentFrequency, currentMode) + currentBFO;
-  root["mode"] = bandModeDesc[currentMode];
+  root["modeIdx"] = currentMode;
   root["rssi"] = rssi;
   root["snr"] = snr;
   root["battery"] = batteryMonitor();
+  root["stepIdx"] = bands[bandIdx].currentStepIdx;
+  root["bandwidthIdx"] = bands[bandIdx].bandwidthIdx;
+  root["agc"] = !agcNdx && !agcIdx;
+  if (agcIdx)
+  {
+    root["attenuation"] = agcNdx;
+  }
+  const char *time = clockGet();
+  if (time)
+  {
+    root["time"] = time;
+  }
+  root["volume"] = volume;
+  root["squelch"] = currentSquelch;
+  if(currentMode != FM)
+  {
+    root["softMuteMaxAttIdx"] = softMuteMaxAttIdx;
+  }
+  if(isSSB())
+  {
+    root["avc"] = SsbAvcIdx;
+  }
+  else if(currentMode != FM)
+  {
+    root["avc"] = AmAvcIdx;
+  }
+
+  if(currentMode == FM)
+  {
+    JsonObject rds = root["rds"].to<JsonObject>();
+    uint16_t piCode = getRdsPiCode();
+    if (piCode)
+    {
+      rds["piCode"] = String(piCode, HEX);
+    }
+    String stationName = getStationName();
+    if (stationName != "")
+    {
+      rds["stationName"] = stationName;
+    }
+
+    String radioText = "";
+    const char *rt = getRadioText();
+    for(; *rt; rt+=strlen(rt)+1) {
+      radioText += String(rt) + " ";
+    }
+    if (radioText != "")
+    {
+      rds["radioText"] = radioText;
+    }
+
+    String programInfo = getProgramInfo();
+    if (programInfo != "")
+    {
+      rds["programInfo"] = programInfo;
+    }
+  }
+
+  String json;
+  serializeJson(doc, json);
+  return json;
+}
+
+const String jsonStatusOptions()
+{
+  JsonDocument doc;
+
+  JsonArray bandsArray = doc["bands"].to<JsonArray>();
+  for(int i = 0; i < getTotalBands(); i++)
+  {
+    JsonObject bandOjb = bandsArray.add<JsonObject>();
+    bandOjb["id"] = i;
+    bandOjb["name"] = bands[i].bandName;
+    bandOjb["type"] = bands[i].bandType;
+    bandOjb["modeIdx"] = bands[i].bandMode;
+    bandOjb["minimumFreq"] = freqToHz(bands[i].minimumFreq, bands[i].bandMode);
+    bandOjb["maximumFreq"] = freqToHz(bands[i].maximumFreq, bands[i].bandMode);
+    bandOjb["currentFreq"] = freqToHz(bands[i].currentFreq, bands[i].bandMode);
+    bandOjb["currentStepIdx"] = bands[i].currentStepIdx;
+    bandOjb["bandwidthIdx"] = bands[i].bandwidthIdx;
+    bandOjb["bandCal"] = bands[i].bandCal;
+  }
+
+  JsonObject stepsObj = doc["steps"].to<JsonObject>();
+  JsonArray fmStepsArray = stepsObj["fm"].to<JsonArray>();
+  for(int i = 0; i < getTotalFmSteps(); i++)
+  {
+    JsonObject stepObj = fmStepsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["step"] = fmSteps[i].step;
+    stepObj["desc"] = fmSteps[i].desc;
+    stepObj["spacing"] = fmSteps[i].spacing;
+  }
+  JsonArray ssbStepsArray = stepsObj["ssb"].to<JsonArray>();
+  for(int i = 0; i < getTotalSsbSteps(); i++)
+  {
+    JsonObject stepObj = ssbStepsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["step"] = ssbSteps[i].step;
+    stepObj["desc"] = ssbSteps[i].desc;
+    stepObj["spacing"] = ssbSteps[i].spacing;
+  }
+  JsonArray amStepsArray = stepsObj["am"].to<JsonArray>();
+  for(int i = 0; i < getTotalAmSteps(); i++)
+  {
+    JsonObject stepObj = amStepsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["step"] = amSteps[i].step;
+    stepObj["desc"] = amSteps[i].desc;
+    stepObj["spacing"] = amSteps[i].spacing;
+  }
+
+  JsonObject bandwidthsObj = doc["bandwidths"].to<JsonObject>();
+  JsonArray fmBandwidthsArray = bandwidthsObj["fm"].to<JsonArray>();
+  for(int i = 0; i < getTotalFmBandwidths(); i++)
+  {
+    JsonObject stepObj = fmBandwidthsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["idx"] = fmBandwidths[i].idx;
+    stepObj["desc"] = fmBandwidths[i].desc;
+  }
+  JsonArray ssbBandwidthsArray = bandwidthsObj["ssb"].to<JsonArray>();
+  for(int i = 0; i < getTotalSsbBandwidths(); i++)
+  {
+    JsonObject stepObj = ssbBandwidthsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["idx"] = ssbBandwidths[i].idx;
+    stepObj["desc"] = ssbBandwidths[i].desc;
+  }
+  JsonArray amBandwidthsArray = bandwidthsObj["am"].to<JsonArray>();
+  for(int i = 0; i < getTotalAmBandwidths(); i++)
+  {
+    JsonObject stepObj = amBandwidthsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["idx"] = amBandwidths[i].idx;
+    stepObj["desc"] = amBandwidths[i].desc;
+  }
+
+  JsonArray modes = doc["modes"].to<JsonArray>();
+  for (int i = 0; i < getTotalModes(); i++)
+  {
+    JsonObject modeObj = modes.add<JsonObject>();
+    modeObj["id"] = i;
+    modeObj["mode"] = bandModeDesc[i];
+  }
 
   String json;
   serializeJson(doc, json);
@@ -236,6 +381,10 @@ void addApiListeners(AsyncWebServer& server)
 {
   server.on("/api/status", HTTP_GET, [] (AsyncWebServerRequest *request) {
     sendJsonResponse(request, 200, jsonStatus());
+  });
+
+  server.on("/api/statusOptions", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    sendJsonResponse(request, 200, jsonStatusOptions());
   });
 
   server.on("/api/memory", HTTP_GET, [] (AsyncWebServerRequest *request) {

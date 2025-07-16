@@ -83,6 +83,12 @@ typedef struct
 extern Band bands[];
 extern Memory memories[];
 extern const UTCOffset utcOffsets[];
+extern const Step fmSteps[];
+extern const Step ssbSteps[];
+extern const Step amSteps[];
+extern const Bandwidth fmBandwidths[];
+extern const Bandwidth ssbBandwidths[];
+extern const Bandwidth amBandwidths[];
 extern const char *bandModeDesc[];
 extern const FMRegion fmRegions[];
 extern int bandIdx;
@@ -118,6 +124,12 @@ uint8_t getRDSMode();
 int getCurrentUTCOffset();
 int getTotalUTCOffsets();
 int getTotalFmRegions();
+int getTotalFmSteps();
+int getTotalSsbSteps();
+int getTotalAmSteps();
+int getTotalFmBandwidths();
+int getTotalSsbBandwidths();
+int getTotalAmBandwidths();
 int getTotalBleModes();
 
 void doSoftMute(int dir);

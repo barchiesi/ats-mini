@@ -36,6 +36,27 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/statusOptions:
+    get:
+      tags:
+        - status
+      summary: Get available status options
+      description: Returns all available options for status fields like bands, etc.
+      operationId: getStatusOptions
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusOptions'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/memory:
     get:
       tags:
@@ -155,12 +176,17 @@ components:
         - ssid
         - mac
         - version
-        - band
+        - bandIdx
         - freq
-        - mode
+        - modeIdx
         - rssi
         - snr
         - battery
+        - stepIdx
+        - bandwidthIdx
+        - agc
+        - volume
+        - squelch
       properties:
         ip:
           type: string
@@ -178,18 +204,18 @@ components:
           type: string
           description: Firmware version string
           example: "F/W: v2.28d Jul 27 2025"
-        band:
-          type: string
-          description: Current band
-          example: "VHF"
+        bandIdx:
+          type: number
+          description: Current band index (references bands array from statusOptions)
+          example: 0
         freq:
           type: number
           description: Current frequency in Hz (includes BFO offset for non-FM modes)
           example: 94200000
-        mode:
-          type: string
-          description: Current modulation mode
-          example: "FM"
+        modeIdx:
+          type: number
+          description: Current modulation mode index (references modes array from statusOptions)
+          example: 0
         rssi:
           type: number
           description: Received signal strength indicator
@@ -203,6 +229,233 @@ components:
           format: float
           description: Battery voltage in volts
           example: 3.878347
+        stepIdx:
+          type: number
+          description: Current frequency step index (references bands array from statusOptions)
+          example: 0
+        bandwidthIdx:
+          type: number
+          description: Current bandwidth index (references bands array from statusOptions)
+          example: 1
+        agc:
+          type: boolean
+          description: Automatic Gain Control status (true when AGC is enabled)
+          example: false
+        attenuation:
+          type: number
+          description: Manual attenuation level (only present when AGC is disabled)
+          example: 10
+        time:
+          type: string
+          description: Current time in HH:MM format (only present when clock is available)
+          example: "15:49"
+        volume:
+          type: number
+          description: Current volume level
+          example: 50
+        squelch:
+          type: number
+          description: Current squelch level (squelch off when 0)
+          example: 7
+        softMuteMaxAttIdx:
+          type: number
+          description: Soft mute maximum attenuation (present for SSB and AM modes)
+          example: 4
+        avc:
+          type: number
+          description: Automatic Volume Control setting (present for SSB and AM modes)
+          example: 10
+        rds:
+          type: object
+          description: RDS (Radio Data System) information (only present in FM mode)
+          properties:
+            piCode:
+              type: string
+              description: Program Identification code in hexadecimal (only present when available)
+              example: "5241"
+            stationName:
+              type: string
+              description: Station name from RDS PS (Program Service) data (only present when available)
+              example: " VIRGIN "
+            radioText:
+              type: string
+              example: "In onda MGK con CLICHE'"
+              description: Radio text from RDS RT (Radio Text) data (only present when available)
+            programInfo:
+              type: string
+              description: Program type information from RDS PTY (Program Type) data (only present when available)
+              example: "Rock Music"
+
+    StatusOptions:
+      type: object
+      required:
+        - bands
+        - steps
+        - bandwidths
+      properties:
+        bands:
+          type: array
+          description: Available bands with their configuration including frequency ranges, modes, and current settings
+          items:
+            $ref: '#/components/schemas/Band'
+        steps:
+          type: object
+          description: Available steps divided by mode
+          properties:
+            fm:
+              type: array
+              description: FM steps
+              items:
+                $ref: '#/components/schemas/Step'
+            ssb:
+              type: array
+              description: SSB steps
+              items:
+                $ref: '#/components/schemas/Step'
+            am:
+              type: array
+              description: AM steps
+              items:
+                $ref: '#/components/schemas/Step'
+        bandwidths:
+          type: object
+          description: Available bandwidths divided by mode
+          properties:
+            fm:
+              type: array
+              description: FM bandwidths
+              items:
+                $ref: '#/components/schemas/Bandwidth'
+            ssb:
+              type: array
+              description: SSB bandwidths
+              items:
+                $ref: '#/components/schemas/Bandwidth'
+            am:
+              type: array
+              description: AM bandwidths
+              items:
+                $ref: '#/components/schemas/Bandwidth'
+        modes:
+          type: array
+          description: Available mode options
+          items:
+            $ref: '#/components/schemas/Mode'
+
+    Band:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - modeIdx
+        - minimumFreq
+        - maximumFreq
+        - currentFreq
+        - currentStepIdx
+        - bandwidthIdx
+        - bandCal
+      properties:
+        id:
+          type: integer
+          description: Band index
+          example: 0
+        name:
+          type: string
+          description: Band name
+          example: "VHF"
+        type:
+          type: integer
+          description: Band type
+          example: 0
+        modeIdx:
+          type: integer
+          description: Band mode index (references modes array from statusOptions)
+          example: 0
+        minimumFreq:
+          type: number
+          description: Minimum frequency for this band in Hz
+          example: 64000000
+        maximumFreq:
+          type: number
+          description: Maximum frequency for this band in Hz
+          example: 108000000
+        currentFreq:
+          type: number
+          description: Current frequency for this band in Hz
+          example: 94200000
+        currentStepIdx:
+          type: integer
+          description: Current step index
+          example: 2
+        bandwidthIdx:
+          type: integer
+          description: Current bandwidth index
+          example: 0
+        bandCal:
+          type: integer
+          description: Band calibration offset
+          example: 0
+
+    Step:
+      type: object
+      required:
+        - id
+        - step
+        - desc
+        - spacing
+      properties:
+        id:
+          type: number
+          description: Step index
+          example: 3
+        step:
+          type: number
+          description: Step size
+          example: 20
+        desc:
+          type: string
+          description: Step description
+          example: "200k"
+        spacing:
+          type: integer
+          description: Step spacing
+          example: 20
+
+    Bandwidth:
+      type: object
+      required:
+        - id
+        - idx
+        - desc
+      properties:
+        id:
+          type: number
+          description: Bandwidth index
+          example: 0
+        idx:
+          type: number
+          description: Bandwidth radio index
+          example: 2
+        desc:
+          type: string
+          description: Bandwith description
+          example: "3.0k"
+
+    Mode:
+      type: object
+      required:
+        - id
+        - mode
+      properties:
+        id:
+          type: number
+          description: Mode option index
+          example: 3
+        mode:
+          type: string
+          description: Mode
+          example: FM
 
     Memory:
       type: object
