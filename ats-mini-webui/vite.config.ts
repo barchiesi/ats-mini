@@ -69,7 +69,7 @@ export default defineConfig({
         server.middlewares.use('/api', (req, res, next) => {
           if (req.method === 'GET' && req.url === '/status') {
             res.setHeader('Content-Type', 'application/json');
-            res.end("{\"ip\":\"10.1.1.1\",\"ssid\":\"ATS-Mini\",\"mac\":\"98:A3:16:C1:DA:9C\",\"version\":\"F/W: v2.28d Jul 27 2025\",\"band\":\"VHF\",\"freq\":94200000,\"mode\":\"FM\",\"rssi\":44,\"snr\":20,\"battery\":3.878347}");
+            res.end("{\"ip\":\"10.1.1.1\",\"ssid\":\"ATS-Mini\",\"mac\":\"98:A3:16:C1:DA:9C\",\"version\":\"F/W: v2.28d Jul 27 2025\",\"band\":\"VHF\",\"freq\":94200000,\"mode\":\"FM\",\"rssi\":52,\"snr\":24,\"battery\":3.937066,\"step\":\"100k\",\"bandwidth\":\"Auto\",\"agc\":true,\"volume\":35,\"softMuteMaxAttIdx\":4,\"rds\":{\"piCode\":\"5241\",\"stationName\":\" VIRGIN \",\"radioText\":\"Virgin Radio \\\"Style Rock\\\"\",\"programInfo\":\"Rock Music\"}}");
 
           } else if (req.method === 'GET' && req.url === '/memory') {
             res.setHeader('Content-Type', 'application/json');

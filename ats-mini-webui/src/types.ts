@@ -9,6 +9,21 @@ export interface Status {
   rssi: number;
   snr: number;
   battery: number;
+  step: string;
+  bandwidth: string;
+  agc: boolean;
+  attenuation?: number;
+  time?: string;
+  volume: number;
+  squelch?: number;
+  softMuteMaxAttIdx: number;
+  avc?: number;
+  rds?: {
+    piCode?: string;
+    stationName?: string;
+    radioText?: string;
+    programInfo?: string;
+  }
 }
 
 export interface Memory {

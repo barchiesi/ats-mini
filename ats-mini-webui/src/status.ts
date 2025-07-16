@@ -8,6 +8,7 @@ const populateStatus = (status: Status) => {
     ipElement.href = `http://${status.ip}`;
   }
 
+  setCellText('time', status.time ?? 'N/A');
   setCellText('ssid', status.ssid);
   setCellText('mac', status.mac);
   setCellText('version', status.version);
@@ -16,6 +17,18 @@ const populateStatus = (status: Status) => {
   setCellText('rssi', `${status.rssi}dBuV`);
   setCellText('snr', `${status.snr}dB`);
   setCellText('battery', `${status.battery.toFixed(2)}V`);
+  setCellText('step', status.step);
+  setCellText('bandwidth', status.bandwidth);
+  setCellText('agc', status.agc ? "On" : "Off");
+  setCellText('attenuation', status.attenuation !== undefined ? String(status.attenuation).padStart(2, '0') : "N/A");
+  setCellText('volume', String(status.volume).padStart(2, '0'));
+  setCellText('squelch', status.squelch ? `${status.squelch}dBuV` : 'N/A');
+  setCellText('softMuteMaxAttIdx', String(status.softMuteMaxAttIdx).padStart(2, '0'));
+  setCellText('avc', status.avc !== undefined ? `${status.avc}` : "N/A");
+  setCellText('piCode', status.rds?.piCode ?? "N/A");
+  setCellText('stationName', status.rds?.stationName ?? "N/A");
+  setCellText('radioText', status.rds?.radioText ?? "N/A");
+  setCellText('programInfo', status.rds?.programInfo ?? "N/A");
 }
 
 const fetchAndPopulateStatus = () => {
