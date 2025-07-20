@@ -10,6 +10,12 @@
 #include <ArduinoJson.h>
 
 
+static inline int clamp_range(int v, int vMin, int vMax)
+{
+  v  = v>vMax? vMax : v<vMin? vMin : v;
+  return(v);
+}
+
 static const String jsonStatus()
 {
   String ip = "";
@@ -32,14 +38,14 @@ static const String jsonStatus()
   root["ssid"] = ssid;
   root["mac"] = getMACAddress();
   root["version"] = getVersion(true);
-  root["band"] = getCurrentBand()->bandName;
+  root["bandIdx"] = bandIdx;
   root["freq"] = freqToHz(currentFrequency, currentMode) + currentBFO;
   root["mode"] = bandModeDesc[currentMode];
   root["rssi"] = rssi;
   root["snr"] = snr;
   root["battery"] = batteryMonitor();
-  root["step"] = getCurrentStep()->desc;
-  root["bandwidth"] = getCurrentBandwidth()->desc;
+  root["stepIdx"] = bands[bandIdx].currentStepIdx;
+  root["bandwidthIdx"] = bands[bandIdx].bandwidthIdx;
   root["agc"] = !agcNdx && !agcIdx;
   if (agcIdx)
   {
@@ -88,6 +94,208 @@ static const String jsonStatus()
     {
       rds["programInfo"] = programInfo;
     }
+  }
+
+  String json;
+  serializeJson(doc, json);
+  return json;
+}
+
+void jsonSetStatus(JsonDocument request)
+{
+  uint32_t prefsSave = 0;
+
+  if(request["bandIdx"].is<int>())
+  {
+    const uint bandIdx = clamp_range(request["bandIdx"], 0, getTotalBands() - 1);
+    switchBand(bandIdx);
+
+    prefsSave |= SAVE_SETTINGS;
+    prefsSave |= SAVE_BANDS;
+  }
+
+  if(request["freq"].is<int>())
+  {
+    const uint freqRead = request["freq"];
+    const uint16_t currentFrequencyRead = freqFromHz(freqRead, currentMode);
+    const int16_t currentBFORead = currentMode == FM ? 0 : bfoFromHz(freqRead);
+
+    updateFrequency(currentFrequencyRead, true);
+    if (isSSB())
+    {
+      updateBFO(currentBFORead, true);
+    }
+
+    // Clear current station name and information
+    clearStationInfo();
+    // Check for named frequencies
+    identifyFrequency(currentFrequency + currentBFO / 1000);
+
+    prefsSave |= SAVE_SETTINGS;
+    prefsSave |= SAVE_CUR_BAND;
+  }
+
+  if(request["stepIdx"].is<int>())
+  {
+    const uint newStepIdx = clamp_range(request["stepIdx"], 0, getLastStep(currentMode));
+    switchStep(newStepIdx);
+
+    prefsSave |= SAVE_CUR_BAND;
+  }
+
+  if(request["bandwidthIdx"].is<int>())
+  {
+    const uint newBdwIdx = clamp_range(request["bandwidthIdx"], 0, getLastBandwidth(currentMode));
+    switchBandwidth(newBdwIdx);
+
+    prefsSave |= SAVE_CUR_BAND;
+  }
+
+  bool setAttenuation = false;
+  if(request["agc"].is<bool>() && request["attenuation"].is<int>())
+  {
+    bool agc = request["agc"];
+    if (!agc)
+    {
+      int8_t attenuation = request["attenuation"];
+      int8_t newAgcIdx;
+      if(currentMode==FM)
+        newAgcIdx = clamp_range(attenuation, 0, 26);
+      else if(isSSB())
+        newAgcIdx = clamp_range(attenuation, 0, 0);
+      else
+        newAgcIdx = clamp_range(attenuation, 0, 36);
+
+      switchAgc(newAgcIdx + 1);
+      setAttenuation = true;
+    }
+  }
+  else if (request["agc"].is<bool>())
+  {
+    bool agc = request["agc"];
+    switchAgc(agc ? 0 : 1);
+    setAttenuation = true;
+  }
+  else if (request["attenuation"].is<int>())
+  {
+    int8_t attenuation = request["attenuation"];
+    int8_t newAgcIdx;
+    if(currentMode==FM)
+      newAgcIdx = clamp_range(attenuation, 0, 26);
+    else if(isSSB())
+      newAgcIdx = clamp_range(attenuation, 0, 0);
+    else
+      newAgcIdx = clamp_range(attenuation, 0, 36);
+
+    switchAgc(newAgcIdx + 1);
+    setAttenuation = true;
+  }
+  if (setAttenuation) prefsSave |= SAVE_SETTINGS;
+
+  if(request["volume"].is<int>())
+  {
+    volume = clamp_range(request["volume"], 0, 63);
+    if(!muteOn()) rx.setVolume(volume);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  if(request["squelch"].is<int>())
+  {
+    currentSquelch = clamp_range(request["squelch"], 0, 127);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  if(currentMode != FM && request["softMuteMaxAttIdx"].is<int>())
+  {
+    int8_t newSoftMute = clamp_range(request["softMuteMaxAttIdx"], 0, 32);
+    switchSoftMute(newSoftMute);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  if(currentMode != FM && request["avc"].is<int>())
+  {
+    int8_t newAvc = clamp_range(request["avc"], 12, 90);
+    switchAvc(newAvc);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  // Save preferences immediately
+  prefsRequestSave(prefsSave, true);
+}
+
+const String jsonStatusOptions()
+{
+  JsonDocument doc;
+
+  JsonArray bandsArray = doc["bands"].to<JsonArray>();
+  for(int i = 0; i < getTotalBands(); i++)
+  {
+    JsonObject bandOjb = bandsArray.add<JsonObject>();
+    bandOjb["id"] = i;
+    bandOjb["bandName"] = bands[i].bandName;
+    bandOjb["bandType"] = bands[i].bandType;
+    bandOjb["bandMode"] = bands[i].bandMode;
+    bandOjb["minimumFreq"] = freqToHz(bands[i].minimumFreq, bands[i].bandMode);
+    bandOjb["maximumFreq"] = freqToHz(bands[i].maximumFreq, bands[i].bandMode);
+    bandOjb["currentFreq"] = freqToHz(bands[i].currentFreq, bands[i].bandMode);
+    bandOjb["currentStepIdx"] = bands[i].currentStepIdx;
+    bandOjb["bandwidthIdx"] = bands[i].bandwidthIdx;
+    bandOjb["bandCal"] = bands[i].bandCal;
+  }
+
+  JsonObject stepsObj = doc["steps"].to<JsonObject>();
+  JsonArray fmStepsArray = stepsObj["fm"].to<JsonArray>();
+  for(int i = 0; i < getTotalFmSteps(); i++)
+  {
+    JsonObject stepObj = fmStepsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["step"] = fmSteps[i].step;
+    stepObj["desc"] = fmSteps[i].desc;
+    stepObj["spacing"] = fmSteps[i].spacing;
+  }
+  JsonArray ssbStepsArray = stepsObj["ssb"].to<JsonArray>();
+  for(int i = 0; i < getTotalSsbSteps(); i++)
+  {
+    JsonObject stepObj = ssbStepsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["step"] = ssbSteps[i].step;
+    stepObj["desc"] = ssbSteps[i].desc;
+    stepObj["spacing"] = ssbSteps[i].spacing;
+  }
+  JsonArray amStepsArray = stepsObj["am"].to<JsonArray>();
+  for(int i = 0; i < getTotalAmSteps(); i++)
+  {
+    JsonObject stepObj = amStepsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["step"] = amSteps[i].step;
+    stepObj["desc"] = amSteps[i].desc;
+    stepObj["spacing"] = amSteps[i].spacing;
+  }
+
+  JsonObject bandwidthsObj = doc["bandwidths"].to<JsonObject>();
+  JsonArray fmBandwidthsArray = bandwidthsObj["fm"].to<JsonArray>();
+  for(int i = 0; i < getTotalFmBandwidths(); i++)
+  {
+    JsonObject stepObj = fmBandwidthsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["idx"] = fmBandwidths[i].idx;
+    stepObj["desc"] = fmBandwidths[i].desc;
+  }
+  JsonArray ssbBandwidthsArray = bandwidthsObj["ssb"].to<JsonArray>();
+  for(int i = 0; i < getTotalSsbBandwidths(); i++)
+  {
+    JsonObject stepObj = ssbBandwidthsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["idx"] = ssbBandwidths[i].idx;
+    stepObj["desc"] = ssbBandwidths[i].desc;
+  }
+  JsonArray amBandwidthsArray = bandwidthsObj["am"].to<JsonArray>();
+  for(int i = 0; i < getTotalAmBandwidths(); i++)
+  {
+    JsonObject stepObj = amBandwidthsArray.add<JsonObject>();
+    stepObj["id"] = i;
+    stepObj["idx"] = amBandwidths[i].idx;
+    stepObj["desc"] = amBandwidths[i].desc;
   }
 
   String json;
@@ -287,6 +495,26 @@ void addApiListeners(AsyncWebServer& server)
 {
   server.on("/api/status", HTTP_GET, [] (AsyncWebServerRequest *request) {
     sendJsonResponse(request, 200, jsonStatus());
+  });
+
+  server.on("/api/status", HTTP_POST,
+    [] (AsyncWebServerRequest *request) {},
+    NULL,
+    [] (AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      JsonDocument jsonRequest;
+      DeserializationError error = deserializeJson(jsonRequest, data, len);
+      if (error)
+      {
+        sendJsonResponse(request, 400, "{\"error\":\"Invalid JSON\"}");
+        return;
+      }
+      jsonSetStatus(jsonRequest);
+
+      sendJsonResponse(request, 200, jsonStatus());
+  });
+
+  server.on("/api/statusOptions", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    sendJsonResponse(request, 200, jsonStatusOptions());
   });
 
   server.on("/api/memory", HTTP_GET, [] (AsyncWebServerRequest *request) {
