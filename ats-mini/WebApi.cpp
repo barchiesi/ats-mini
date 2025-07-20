@@ -10,6 +10,12 @@
 #include <ArduinoJson.h>
 
 
+static inline int clamp_range(int v, int vMin, int vMax)
+{
+  v  = v>vMax? vMax : v<vMin? vMin : v;
+  return(v);
+}
+
 static const String jsonStatus()
 {
   String ip = "";
@@ -32,7 +38,7 @@ static const String jsonStatus()
   root["ssid"] = ssid;
   root["mac"] = getMACAddress();
   root["version"] = getVersion(true);
-  root["band"] = getCurrentBand()->bandName;
+  root["bandIdx"] = bandIdx;
   root["freq"] = currentMode == FM ? currentFrequency * 10 * 1000 : currentFrequency * 1000 + currentBFO;
   root["mode"] = bandModeDesc[currentMode];
   root["rssi"] = rssi;
@@ -88,6 +94,117 @@ static const String jsonStatus()
     {
       rds["programInfo"] = programInfo;
     }
+  }
+
+  String json;
+  serializeJson(doc, json);
+  return json;
+}
+
+void jsonSetStatus(JsonDocument request)
+{
+  uint32_t prefsSave = 0;
+
+  if(request["bandIdx"].is<int>())
+  {
+    const uint bandIdx = clamp_range(request["bandIdx"], 0, getTotalBands() - 1);
+    switchBand(bandIdx);
+
+    prefsSave |= SAVE_SETTINGS;
+    prefsSave |= SAVE_BANDS;
+  }
+
+  if(request["freq"].is<int>())
+  {
+    const uint freqRead = request["freq"];
+    const uint16_t currentFrequencyRead = currentMode == FM ? freqRead / 10 / 1000 : freqRead / 1000;
+    const int16_t currentBFORead = currentMode == FM ? 0 : freqRead % 1000;
+
+    updateFrequency(currentFrequencyRead, true);
+    if (isSSB())
+    {
+      updateBFO(currentBFORead, true);
+    }
+
+    // Clear current station name and information
+    clearStationInfo();
+    // Check for named frequencies
+    identifyFrequency(currentFrequency + currentBFO / 1000);
+
+    prefsSave |= SAVE_SETTINGS;
+    prefsSave |= SAVE_CUR_BAND;
+  }
+
+  bool setAttenuation = false;
+  if(request["agc"].is<bool>() && request["attenuation"].is<int>())
+  {
+    bool agc = request["agc"];
+    if (!agc)
+    {
+      int8_t attenuation = request["attenuation"];
+      int8_t newAgcIdx;
+      if(currentMode==FM)
+        newAgcIdx = clamp_range(attenuation, 0, 26);
+      else if(isSSB())
+        newAgcIdx = clamp_range(attenuation, 0, 0);
+      else
+        newAgcIdx = clamp_range(attenuation, 0, 36);
+
+      switchAgc(newAgcIdx + 1);
+      setAttenuation = true;
+    }
+  }
+  else if (request["agc"].is<bool>())
+  {
+    bool agc = request["agc"];
+    switchAgc(agc ? 0 : 1);
+    setAttenuation = true;
+  }
+  else if (request["attenuation"].is<int>())
+  {
+    int8_t attenuation = request["attenuation"];
+    int8_t newAgcIdx;
+    if(currentMode==FM)
+      newAgcIdx = clamp_range(attenuation, 0, 26);
+    else if(isSSB())
+      newAgcIdx = clamp_range(attenuation, 0, 0);
+    else
+      newAgcIdx = clamp_range(attenuation, 0, 36);
+
+    switchAgc(newAgcIdx + 1);
+    setAttenuation = true;
+  }
+  if (setAttenuation) prefsSave |= SAVE_SETTINGS;
+
+  if(request["volume"].is<int>())
+  {
+    volume = clamp_range(request["volume"], 0, 63);
+    if(!muteOn()) rx.setVolume(volume);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  // Save preferences immediately
+  prefsRequestSave(prefsSave, true);
+}
+
+const String jsonStatusOptions()
+{
+  JsonDocument doc;
+
+  JsonArray bandsArray = doc["bands"].to<JsonArray>();
+  for(int i = 0; i < getTotalBands(); i++)
+  {
+    JsonObject bandOjb = bandsArray.add<JsonObject>();
+    bandOjb["id"] = i;
+    bandOjb["bandName"] = bands[i].bandName;
+    bandOjb["bandType"] = bands[i].bandType;
+    bandOjb["bandMode"] = bands[i].bandMode;
+    bandOjb["minimumFreq"] = bands[i].bandMode == FM ? bands[i].minimumFreq * 10 * 1000 : bands[i].minimumFreq * 1000;
+    bandOjb["maximumFreq"] = bands[i].bandMode == FM ? bands[i].maximumFreq * 10 * 1000 : bands[i].maximumFreq * 1000;
+    bandOjb["currentFreq"] = bands[i].bandMode == FM ? bands[i].currentFreq * 10 * 1000 : bands[i].currentFreq * 1000;
+    bandOjb["currentStepIdx"] = bands[i].currentStepIdx;
+    bandOjb["bandwidthIdx"] = bands[i].bandwidthIdx;
+    bandOjb["bandCal"] = bands[i].bandCal;
   }
 
   String json;
@@ -367,6 +484,26 @@ void addApiListeners(AsyncWebServer& server)
 {
   server.on("/api/status", HTTP_GET, [] (AsyncWebServerRequest *request) {
     sendJsonResponse(request, 200, jsonStatus());
+  });
+
+  server.on("/api/status", HTTP_POST,
+    [] (AsyncWebServerRequest *request) {},
+    NULL,
+    [] (AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      JsonDocument jsonRequest;
+      DeserializationError error = deserializeJson(jsonRequest, data, len);
+      if (error)
+      {
+        sendJsonResponse(request, 400, "{\"error\":\"Invalid JSON\"}");
+        return;
+      }
+      jsonSetStatus(jsonRequest);
+
+      sendJsonResponse(request, 200, jsonStatus());
+  });
+
+  server.on("/api/statusOptions", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    sendJsonResponse(request, 200, jsonStatusOptions());
   });
 
   server.on("/api/memory", HTTP_GET, [] (AsyncWebServerRequest *request) {

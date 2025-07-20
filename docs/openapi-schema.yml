@@ -35,6 +35,57 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - status
+      summary: Set ATS-Mini status
+      operationId: setStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '400':
+          description: Invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/statusOptions:
+    get:
+      tags:
+        - status
+      summary: Get available status options
+      description: Returns all available options for status fields like bands, etc.
+      operationId: getStatusOptions
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusOptions'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /api/memory:
     get:
@@ -215,10 +266,10 @@ components:
           type: string
           description: Firmware version string
           example: "F/W: v2.28d Jul 27 2025"
-        band:
-          type: string
-          description: Current band
-          example: "VHF"
+        bandIdx:
+          type: number
+          description: Current band index (references bands array from statusOptions)
+          example: 0
         freq:
           type: number
           description: Current frequency in Hz (includes BFO offset for non-FM modes)
@@ -296,6 +347,99 @@ components:
               type: string
               description: Program type information from RDS PTY (Program Type) data (only present when available)
               example: "Rock Music"
+
+    StatusUpdate:
+      type: object
+      properties:
+        bandIdx:
+          type: number
+          description: "Band index"
+          example: 0
+        freq:
+          type: number
+          description: "Frequency to set in Hz"
+          example: 94200000
+        agc:
+          type: boolean
+          description: "Automatic Gain Control enable/disable"
+          example: true
+        attenuation:
+          type: integer
+          description: "Manual attenuation level (0-26 for FM, 0 for SSB, 0-36 for AM). Setting this parameter disables AGC."
+          minimum: 0
+          example: 10
+        volume:
+          type: number
+          description: "Volume level (0-63)"
+          minimum: 0
+          maximum: 63
+          example: 50
+
+    StatusOptions:
+      type: object
+      required:
+        - bands
+      properties:
+        bands:
+          type: array
+          description: Available bands with their configuration including frequency ranges, modes, and current settings
+          items:
+            $ref: '#/components/schemas/Band'
+
+    Band:
+      type: object
+      required:
+        - id
+        - bandName
+        - bandType
+        - bandMode
+        - minimumFreq
+        - maximumFreq
+        - currentFreq
+        - currentStepIdx
+        - bandwidthIdx
+        - bandCal
+      properties:
+        id:
+          type: integer
+          description: Band index
+          example: 0
+        bandName:
+          type: string
+          description: Band name
+          example: "VHF"
+        bandType:
+          type: integer
+          description: Band type
+          example: 0
+        bandMode:
+          type: integer
+          description: Band mode identifier (0=FM, 1=LSB, 2=USB, 3=AM)
+          example: 0
+        minimumFreq:
+          type: number
+          description: Minimum frequency for this band in Hz
+          example: 64000000
+        maximumFreq:
+          type: number
+          description: Maximum frequency for this band in Hz
+          example: 108000000
+        currentFreq:
+          type: number
+          description: Current frequency for this band in Hz
+          example: 94200000
+        currentStepIdx:
+          type: integer
+          description: Current step index
+          example: 2
+        bandwidthIdx:
+          type: integer
+          description: Current bandwidth index
+          example: 0
+        bandCal:
+          type: integer
+          description: Band calibration offset
+          example: 0
 
     Memory:
       type: object

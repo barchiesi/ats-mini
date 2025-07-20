@@ -129,6 +129,7 @@ int getTotalBleModes();
 bool tuneToMemory(const Memory *memory);
 void doSoftMute(int dir);
 void doAgc(int dir);
+void switchAgc(int8_t newAgcIdx);
 void doAvc(int dir);
 void doFmRegion(int dir);
 void doBandwidth(int dir);
@@ -138,5 +139,6 @@ void doCal(int dir);
 void doStep(int dir);
 void doMode(int dir);
 void doBand(int dir);
+void switchBand(int newBandIdx);
 
 #endif // MENU_H

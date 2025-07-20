@@ -731,12 +731,27 @@ void doStep(int dir)
 
 void doAgc(int dir)
 {
+  int8_t newAgcIdx;
   if(currentMode==FM)
-    agcIdx = FmAgcIdx = wrap_range(FmAgcIdx, dir, 0, 27);
+    newAgcIdx = wrap_range(FmAgcIdx, dir, 0, 27);
   else if(isSSB())
-    agcIdx = SsbAgcIdx = wrap_range(SsbAgcIdx, dir, 0, 1);
+    newAgcIdx = wrap_range(SsbAgcIdx, dir, 0, 1);
   else
-    agcIdx = AmAgcIdx = wrap_range(AmAgcIdx, dir, 0, 37);
+    newAgcIdx = wrap_range(AmAgcIdx, dir, 0, 37);
+
+  switchAgc(newAgcIdx);
+}
+
+void switchAgc(int8_t newAgcIdx)
+{
+  if(currentMode==FM)
+    FmAgcIdx = newAgcIdx;
+  else if(isSSB())
+    SsbAgcIdx = newAgcIdx;
+  else
+    AmAgcIdx = newAgcIdx;
+
+  agcIdx = newAgcIdx;
 
   // Process agcIdx to generate disableAgc and agcIdx
   // agcIdx     0 1 2 3 4 5 6  ..... n    (n:    FM = 27, AM = 37, SSB = 1)
@@ -794,12 +809,21 @@ void doSoftMute(int dir)
 
 void doBand(int dir)
 {
+  // Define new band
+  int newBandIdx = wrap_range(bandIdx, dir, 0, LAST_ITEM(bands));
+
+  // Enable the new band
+  switchBand(newBandIdx);
+}
+
+void switchBand(int newBandIdx)
+{
   // Save current band settings
   bands[bandIdx].currentFreq = currentFrequency + currentBFO / 1000;
   bands[bandIdx].bandMode = currentMode;
 
   // Change band
-  bandIdx = wrap_range(bandIdx, dir, 0, LAST_ITEM(bands));
+  bandIdx = newBandIdx;
 
   // Enable the new band
   selectBand(bandIdx);
