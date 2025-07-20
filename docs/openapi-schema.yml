@@ -35,6 +35,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - status
+      summary: Set ATS-Mini status
+      operationId: setStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '400':
+          description: Invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /api/memory:
     get:
@@ -295,6 +325,20 @@ components:
               type: string
               description: Program type information from RDS PTY (Program Type) data (only present when available)
               example: "Rock Music"
+
+    StatusUpdate:
+      type: object
+      properties:
+        freq:
+          type: number
+          example: 94200000
+          description: "Frequency to set in Hz"
+        volume:
+          type: number
+          minimum: 0
+          maximum: 63
+          example: 50
+          description: "Volume level (0-63)"
 
     Memory:
       type: object
