@@ -11,6 +11,12 @@
 
 Preferences storedPrefs;
 
+static inline int clamp_range(int v, int vMin, int vMax)
+{
+  v  = v>vMax? vMax : v<vMin? vMin : v;
+  return(v);
+}
+
 static const String jsonStatus()
 {
   String ip = "";
@@ -94,6 +100,21 @@ static const String jsonStatus()
   String json;
   serializeJson(doc, json);
   return json;
+}
+
+void jsonSetStatus(JsonDocument request)
+{
+  bool eepromSave = false;
+
+  if(request["volume"].is<int>())
+  {
+    volume = clamp_range(request["volume"], 0, 63);
+    if(!muteOn()) rx.setVolume(volume);
+    eepromSave = true;
+  }
+
+  // Save EEPROM immediately
+  if(eepromSave) eepromRequestSave(true);
 }
 
 static const String jsonMemory()
@@ -381,6 +402,22 @@ void addApiListeners(AsyncWebServer& server)
 {
   server.on("/api/status", HTTP_GET, [] (AsyncWebServerRequest *request) {
     sendJsonResponse(request, 200, jsonStatus());
+  });
+
+  server.on("/api/status", HTTP_POST,
+    [] (AsyncWebServerRequest *request) {},
+    NULL,
+    [] (AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      JsonDocument jsonRequest;
+      DeserializationError error = deserializeJson(jsonRequest, data, len);
+      if (error)
+      {
+        sendJsonResponse(request, 400, "{\"error\":\"Invalid JSON\"}");
+        return;
+      }
+      jsonSetStatus(jsonRequest);
+
+      sendJsonResponse(request, 200, jsonStatus());
   });
 
   server.on("/api/memory", HTTP_GET, [] (AsyncWebServerRequest *request) {

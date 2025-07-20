@@ -34,6 +34,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - status
+      summary: Set ATS-Mini status
+      operationId: setStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '400':
+          description: Invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /api/memory:
     get:
@@ -235,6 +265,20 @@ components:
               type: string
               example: "Rock Music"
               description: "Only present when program info is available"
+
+    StatusUpdate:
+      type: object
+      properties:
+        frequency:
+          type: number
+          example: 9420
+          description: "Frequency to set in kHz"
+        volume:
+          type: number
+          minimum: 0
+          maximum: 63
+          example: 50
+          description: "Volume level (0-63)"
 
     Memory:
       type: object
