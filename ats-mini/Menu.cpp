@@ -264,7 +264,7 @@ static const char *wifiModeDesc[] =
 //
 
 // FM (kHz * 10)
-static const Step fmSteps[] =
+const Step fmSteps[] =
 {
   {   1, "10k",   1 },
   {   5, "50k",   5 },
@@ -272,6 +272,7 @@ static const Step fmSteps[] =
   {  20, "200k", 20 },
   { 100, "1M",   10 },
 };
+int getTotalFmSteps() { return(ITEM_COUNT(fmSteps)); }
 
 static const uint8_t fmFastSteps[] =
 {
@@ -283,7 +284,7 @@ static const uint8_t fmFastSteps[] =
 };
 
 // SSB (Hz)
-static const Step ssbSteps[] =
+const Step ssbSteps[] =
 {
   {    10, "10",  1  },
   {    25, "25",  1  },
@@ -295,6 +296,7 @@ static const Step ssbSteps[] =
   {  9000, "9k",  9  },
   { 10000, "10k", 10 },
 };
+int getTotalSsbSteps() { return(ITEM_COUNT(ssbSteps)); }
 
 static const uint8_t ssbFastSteps[] =
 {
@@ -310,7 +312,7 @@ static const uint8_t ssbFastSteps[] =
 };
 
 // AM (kHz)
-static const Step amSteps[] =
+const Step amSteps[] =
 {
   {    1, "1k",    1 },
   {    5, "5k",    5 },
@@ -320,6 +322,7 @@ static const Step amSteps[] =
   {  100, "100k", 10 },
   { 1000, "1M",   10 },
 };
+int getTotalAmSteps() { return(ITEM_COUNT(amSteps)); }
 
 static const uint8_t amFastSteps[] =
 {
@@ -336,7 +339,7 @@ static const Step *steps[4] = { fmSteps, ssbSteps, ssbSteps, amSteps };
 static const uint8_t *fastSteps[4] = { fmFastSteps, ssbFastSteps, ssbFastSteps, amFastSteps };
 static const uint8_t defaultStepIdx[4] = { 2, 5, 5, 1 };
 
-static int getLastStep(int mode)
+int getLastStep(int mode)
 {
   switch(mode)
   {
@@ -393,7 +396,7 @@ static uint8_t getMaxFreqInputPos()
 // Bandwidth Menu
 //
 
-static const Bandwidth fmBandwidths[] =
+const Bandwidth fmBandwidths[] =
 {
   { 0, "Auto" }, // Automatic - default
   { 1, "110k" }, // Force wide (110 kHz) channel filter.
@@ -401,8 +404,9 @@ static const Bandwidth fmBandwidths[] =
   { 3, "60k"  },
   { 4, "40k"  }
 };
+int getTotalFmBandwidths() { return(ITEM_COUNT(fmBandwidths)); }
 
-static const Bandwidth ssbBandwidths[] =
+const Bandwidth ssbBandwidths[] =
 {
   { 4, "0.5k" },
   { 5, "1.0k" },
@@ -411,8 +415,9 @@ static const Bandwidth ssbBandwidths[] =
   { 2, "3.0k" },
   { 3, "4.0k" }
 };
+int getTotalSsbBandwidths() { return(ITEM_COUNT(ssbBandwidths)); }
 
-static const Bandwidth amBandwidths[] =
+const Bandwidth amBandwidths[] =
 {
   { 4, "1.0k" },
   { 5, "1.8k" },
@@ -422,6 +427,7 @@ static const Bandwidth amBandwidths[] =
   { 1, "4.0k" },
   { 0, "6.0k" }
 };
+int getTotalAmBandwidths() { return(ITEM_COUNT(amBandwidths)); }
 
 static const Bandwidth *bandwidths[4] =
 {
@@ -430,7 +436,7 @@ static const Bandwidth *bandwidths[4] =
 
 static const uint8_t defaultBwIdx[4] = { 0, 4, 4, 4 };
 
-static int getLastBandwidth(int mode)
+int getLastBandwidth(int mode)
 {
   switch(mode)
   {
@@ -564,16 +570,32 @@ void doAvc(int dir)
   // Only allow for AM and SSB modes
   if(currentMode==FM) return;
 
+  int8_t newAvc;
   if(isSSB())
   {
-    SsbAvcIdx = wrap_range(SsbAvcIdx, 2*dir, 12, 90);
-    rx.setAvcAmMaxGain(SsbAvcIdx);
+    newAvc = wrap_range(SsbAvcIdx, 2*dir, 12, 90);
   }
   else
   {
-    AmAvcIdx = wrap_range(AmAvcIdx, 2*dir, 12, 90);
-    rx.setAvcAmMaxGain(AmAvcIdx);
+    newAvc = wrap_range(AmAvcIdx, 2*dir, 12, 90);
   }
+  switchAvc(newAvc);
+}
+
+void switchAvc(int8_t newAvc)
+{
+  // Only allow for AM and SSB modes
+  if(currentMode==FM) return;
+
+  if(isSSB())
+  {
+    SsbAvcIdx = newAvc;
+  }
+  else
+  {
+    AmAvcIdx = newAvc;
+  }
+  rx.setAvcAmMaxGain(newAvc);
 }
 
 void doFmRegion(int dir)
@@ -719,8 +741,15 @@ static void clickMemory(uint8_t idx, bool shortPress)
 void doStep(int dir)
 {
   uint8_t idx = bands[bandIdx].currentStepIdx;
-
   idx = wrap_range(idx, dir, 0, getLastStep(currentMode));
+
+  switchStep(idx);
+}
+
+void switchStep(uint8_t idx)
+{
+  if(idx < 0 || idx > getLastStep(currentMode)) return;
+
   bands[bandIdx].currentStepIdx = idx;
 
   rx.setFrequencyStep(steps[currentMode][idx].step);
@@ -734,12 +763,27 @@ void doStep(int dir)
 
 void doAgc(int dir)
 {
+  int8_t newAgcIdx;
   if(currentMode==FM)
-    agcIdx = FmAgcIdx = wrap_range(FmAgcIdx, dir, 0, 27);
+    newAgcIdx = wrap_range(FmAgcIdx, dir, 0, 27);
   else if(isSSB())
-    agcIdx = SsbAgcIdx = wrap_range(SsbAgcIdx, dir, 0, 1);
+    newAgcIdx = wrap_range(SsbAgcIdx, dir, 0, 1);
   else
-    agcIdx = AmAgcIdx = wrap_range(AmAgcIdx, dir, 0, 37);
+    newAgcIdx = wrap_range(AmAgcIdx, dir, 0, 37);
+
+  switchAgc(newAgcIdx);
+}
+
+void switchAgc(int8_t newAgcIdx)
+{
+  if(currentMode==FM)
+    FmAgcIdx = newAgcIdx;
+  else if(isSSB())
+    SsbAgcIdx = newAgcIdx;
+  else
+    AmAgcIdx = newAgcIdx;
+
+  agcIdx = newAgcIdx;
 
   // Process agcIdx to generate disableAgc and agcIdx
   // agcIdx     0 1 2 3 4 5 6  ..... n    (n:    FM = 27, AM = 37, SSB = 1)
@@ -787,22 +831,45 @@ void doSoftMute(int dir)
   // Nothing to do if FM mode
   if(currentMode==FM) return;
 
+  int8_t newSoftMuteMaxAttIdx;
   if(isSSB())
-    softMuteMaxAttIdx = SsbSoftMuteIdx = wrap_range(SsbSoftMuteIdx, dir, 0, 32);
+    newSoftMuteMaxAttIdx = wrap_range(SsbSoftMuteIdx, dir, 0, 32);
   else
-    softMuteMaxAttIdx = AmSoftMuteIdx = wrap_range(AmSoftMuteIdx, dir, 0, 32);
+    newSoftMuteMaxAttIdx = wrap_range(AmSoftMuteIdx, dir, 0, 32);
+
+  switchSoftMute(newSoftMuteMaxAttIdx);
+}
+
+void switchSoftMute(int8_t newSoftMuteMaxAttIdx)
+{
+  // Nothing to do if FM mode
+  if(currentMode==FM) return;
+
+  if(isSSB())
+    softMuteMaxAttIdx = SsbSoftMuteIdx = newSoftMuteMaxAttIdx;
+  else
+    softMuteMaxAttIdx = AmSoftMuteIdx = newSoftMuteMaxAttIdx;
 
   rx.setAmSoftMuteMaxAttenuation(softMuteMaxAttIdx);
 }
 
 void doBand(int dir)
 {
+  // Define new band
+  int newBandIdx = wrap_range(bandIdx, dir, 0, LAST_ITEM(bands));
+
+  // Enable the new band
+  switchBand(newBandIdx);
+}
+
+void switchBand(int newBandIdx)
+{
   // Save current band settings
   bands[bandIdx].currentFreq = currentFrequency + currentBFO / 1000;
   bands[bandIdx].bandMode = currentMode;
 
   // Change band
-  bandIdx = wrap_range(bandIdx, dir, 0, LAST_ITEM(bands));
+  bandIdx = newBandIdx;
 
   // Enable the new band
   selectBand(bandIdx);
@@ -811,8 +878,14 @@ void doBand(int dir)
 void doBandwidth(int dir)
 {
   uint8_t idx = bands[bandIdx].bandwidthIdx;
-
   idx = wrap_range(idx, dir, 0, getLastBandwidth(currentMode));
+  switchBandwidth(idx);
+}
+
+void switchBandwidth(uint8_t idx)
+{
+  if(idx < 0 || idx > getLastBandwidth(currentMode)) return;
+
   bands[bandIdx].bandwidthIdx = idx;
   setBandwidth();
 }
