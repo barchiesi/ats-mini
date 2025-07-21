@@ -34,7 +34,14 @@
     </TR>
     <TR>
         <TD CLASS='LABEL'>Frequency</TD>
-        <TD id="frequency"></TD>
+        <TD>
+            <span id="frequencyDisplay"></span>
+            <input class="hidden" id="frequency" type="number"/>
+            <span id="frequencyUnit"></span>
+            <button id="frequencyEditButton">✎</button>
+            <button class="hidden" id="frequencyConfirmButton">✓</button>
+            <button class="hidden" id="frequencyCancelButton">🗙</button>
+        </TD>
     </TR>
     <TR>
         <TD CLASS='LABEL'>Signal Strength</TD>
@@ -66,7 +73,10 @@
     </TR>
     <TR>
         <TD CLASS='LABEL'>Volume</TD>
-        <TD id="volume"></TD>
+        <TD>
+            <SPAN id="volumeValue" style="display: inline-block; min-width: 3em">---</SPAN>
+            <INPUT id="volume" max="63" min="0" type="range" value="30">
+        </TD>
     </TR>
     <TR>
         <TD CLASS='LABEL'>Squelch</TD>
