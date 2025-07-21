@@ -1,5 +1,6 @@
 import {Status} from "./types";
-import {formatFrequency, responseToJson, setCellText} from "./utils";
+import {debounce, formatFrequency, responseToJson, setCellText, setInputValue, syncValues} from "./utils";
+
 
 const populateStatus = (status: Status) => {
   const ipElement = document.getElementById('ip') as HTMLAnchorElement;
@@ -21,7 +22,11 @@ const populateStatus = (status: Status) => {
   setCellText('bandwidth', status.bandwidth);
   setCellText('agc', status.agc ? "On" : "Off");
   setCellText('attenuation', status.attenuation !== undefined ? String(status.attenuation).padStart(2, '0') : "N/A");
-  setCellText('volume', String(status.volume).padStart(2, '0'));
+
+  setInputValue('volume', String(status.volume));
+  const volumeSpan = document.getElementById('volumeValue') as HTMLSpanElement;
+  if (volumeSpan) volumeSpan.textContent = status.volume.toString().padStart(2, '0');
+
   setCellText('squelch', status.squelch ? `${status.squelch}dBuV` : 'N/A');
   setCellText('softMuteMaxAttIdx', String(status.softMuteMaxAttIdx).padStart(2, '0'));
   setCellText('avc', status.avc !== undefined ? `${status.avc}` : "N/A");
@@ -31,7 +36,13 @@ const populateStatus = (status: Status) => {
   setCellText('programInfo', status.rds?.programInfo ?? "N/A");
 }
 
+let isPaused = false;
+
 const fetchAndPopulateStatus = () => {
+  if (isPaused) {
+    return
+  }
+
   // Fetch status from API
   fetch('/api/status')
     .then(responseToJson)
@@ -44,6 +55,31 @@ const fetchAndPopulateStatus = () => {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  syncValues('volume', 'volumeValue');
+
+  const volumeInput = document.getElementById('volume') as HTMLInputElement;
+  if (volumeInput) {
+    const debouncedVolumeChange = debounce(() => {
+      const volume = parseInt(volumeInput.value);
+      isPaused = false;
+      fetch('/api/status', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({volume})
+      })
+        .catch(error => {
+          console.error('Error fetching status:', error);
+        });
+    });
+
+    volumeInput.addEventListener('input', () => {
+      isPaused = true;
+      debouncedVolumeChange();
+    });
+  }
+
   // Initial fetch
   fetchAndPopulateStatus();
 
