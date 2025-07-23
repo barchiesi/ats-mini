@@ -1,5 +1,5 @@
 import {Status} from "./types";
-import {debounce, formatFrequency, responseToJson, setCellText, setInputValue, syncValues} from "./utils";
+import {debounce, responseToJson, setCellText, setInputValue, syncValues} from "./utils";
 
 
 const populateStatus = (status: Status) => {
@@ -14,7 +14,7 @@ const populateStatus = (status: Status) => {
   setCellText('mac', status.mac);
   setCellText('version', status.version);
   setCellText('band', status.band);
-  setCellText('frequency', formatFrequency(status.freq, status.mode));
+  setInputValue('frequency', status.freq.toString());
   setCellText('rssi', `${status.rssi}dBuV`);
   setCellText('snr', `${status.snr}dB`);
   setCellText('battery', `${status.battery.toFixed(2)}V`);
@@ -56,6 +56,37 @@ const fetchAndPopulateStatus = () => {
 
 document.addEventListener('DOMContentLoaded', () => {
   syncValues('volume', 'volumeValue');
+
+  const frequencyInput = document.getElementById('frequency') as HTMLInputElement;
+  if (frequencyInput) {
+    const debouncedVolumeChange = debounce(() => {
+      const freq = parseFloat(frequencyInput.value);
+      isPaused = false;
+      fetch('/api/status', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({freq})
+      })
+        .catch(error => {
+          console.error('Error fetching status:', error);
+        });
+    });
+
+    frequencyInput.addEventListener('focus', () => {
+      isPaused = true;
+    });
+
+    frequencyInput.addEventListener('blur', () => {
+      isPaused = false;
+    });
+
+    frequencyInput.addEventListener('input', () => {
+      isPaused = true;
+      debouncedVolumeChange()
+    });
+  }
 
   const volumeInput = document.getElementById('volume') as HTMLInputElement;
   if (volumeInput) {
