@@ -106,6 +106,25 @@ void jsonSetStatus(JsonDocument request)
 {
   bool eepromSave = false;
 
+  if(request["freq"].is<double>())
+  {
+    double frequency = request["freq"];
+
+    if(currentMode == FM)
+    {
+      currentFrequency = frequency;
+      currentBFO = 0;
+    }
+    else
+    {
+      // root["freq"] = currentMode == FM ? currentFrequency : currentFrequency + currentBFO / 1000.0;
+      // currentFrequency + currentBFO / 1000.0
+      // currentFrequency = frequency - currentBFO / 1000.0;
+    }
+
+    eepromSave = true;
+  }
+
   if(request["volume"].is<int>())
   {
     volume = clamp_range(request["volume"], 0, 63);
