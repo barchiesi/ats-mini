@@ -140,6 +140,7 @@ int getTotalSsbBandwidths();
 int getTotalAmBandwidths();
 int getTotalBleModes();
 
+bool tuneToMemory(const Memory *memory);
 void doSoftMute(int dir);
 void switchSoftMute(int8_t newSoftMuteMaxAttIdx);
 void doAgc(int dir);
