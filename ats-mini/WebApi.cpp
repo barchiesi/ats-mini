@@ -324,20 +324,55 @@ const String jsonMemory()
 
   for(int i = 0; i < MEMORY_COUNT; i++)
   {
-    JsonObject memObj = memories_array.add<JsonObject>();
-
     if(!memories[i].freq)
     {
-      // Add empty object for unused memory slots
+      // Skip unused memory slots
       continue;
     }
 
+    JsonObject memObj = memories_array.add<JsonObject>();
     memObj["id"] = i;
     memObj["freq"] = memories[i].freq;
-    memObj["band"] = bands[memories[i].band].bandName;
-    memObj["mode"] = bandModeDesc[memories[i].mode];
+    memObj["bandIdx"] = memories[i].band;
+    memObj["modeIdx"] = memories[i].mode;
     memObj["name"] = memories[i].name;
   }
+
+  String json;
+  serializeJson(doc, json);
+  return json;
+}
+
+void jsonSetMemory(int memoryIdx, JsonObject request)
+{
+  if (!request["id"].is<int>() || !request["freq"].is<int>() ||
+      !request["modeIdx"].is<int>() || !request["bandIdx"].is<int>() ||
+      !request["name"].is<String>())
+  {
+    return;
+  }
+
+  Memory updatedMemory;
+  updatedMemory.freq  = request["freq"];
+  updatedMemory.mode  = request["modeIdx"];
+  updatedMemory.band  = request["bandIdx"];
+  sprintf(updatedMemory.name, "%.9s", String(request["name"]).c_str());
+  memories[memoryIdx] = updatedMemory;
+}
+
+void jsonSetBulkMemory(JsonArray request)
+{
+  for (JsonObject memoryItem : request)
+  {
+    jsonSetMemory(memoryItem["id"], memoryItem);
+  }
+}
+
+const String jsonMemoryOptions()
+{
+  JsonDocument doc;
+
+  doc["size"] = MEMORY_COUNT;
 
   String json;
   serializeJson(doc, json);
@@ -616,6 +651,156 @@ void addApiListeners(AsyncWebServer& server)
     sendJsonResponse(request, 200, jsonMemory());
   });
 
+  server.on("/api/memoryOptions", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    sendJsonResponse(request, 200, jsonMemoryOptions());
+  });
+
+  server.on("/api/memory", HTTP_ANY,
+    [] (AsyncWebServerRequest *request) {
+      String url = request->url();
+
+      // Check if this is a memory store request
+      if (request->method() == HTTP_POST && url.startsWith("/api/memory/") && url.endsWith("/storeCurrent"))
+      {
+        String memoryIdxStr = url.substring(12); // Remove "/api/memory/"
+        memoryIdxStr = memoryIdxStr.substring(0, memoryIdxStr.length() - 13); // Remove "/storeCurrent"
+
+        const int memoryIdx = memoryIdxStr.toInt();
+
+        if (memoryIdx >= MEMORY_COUNT || memoryIdx < 0)
+        {
+          sendJsonResponse(request, 400, "{\"error\":\"Invalid memory index\"}");
+          return;
+        }
+
+        const Memory *memory = &memories[memoryIdx];
+        if(memory->freq)
+        {
+          sendJsonResponse(request, 400, "{\"error\":\"Memory slot is not empty, clear it before storing\"}");
+          return;
+        }
+
+        Memory newMemory;
+        newMemory.freq  = freqToHz(currentFrequency, currentMode) + currentBFO;
+        newMemory.mode  = currentMode;
+        newMemory.band  = bandIdx;
+        sprintf(newMemory.name, "%.9s", getStationName());
+        memories[memoryIdx] = newMemory;
+
+        prefsRequestSave(SAVE_MEMORIES, true);
+
+        sendJsonResponse(request, 200, jsonMemory());
+      }
+
+      // Check if this is a memory tune request
+      if (request->method() == HTTP_POST && url.startsWith("/api/memory/") && url.endsWith("/tune"))
+      {
+        String memoryIdxStr = url.substring(12); // Remove "/api/memory/"
+        memoryIdxStr = memoryIdxStr.substring(0, memoryIdxStr.length() - 5); // Remove "/tune"
+
+        const int memoryIdx = memoryIdxStr.toInt();
+
+        if (memoryIdx >= MEMORY_COUNT || memoryIdx < 0)
+        {
+          sendJsonResponse(request, 400, "{\"error\":\"Invalid memory index\"}");
+          return;
+        }
+
+        const Memory *memory = &memories[memoryIdx];
+
+        if(!memory->freq)
+        {
+          sendJsonResponse(request, 400, "{\"error\":\"Memory slot is empty\"}");
+          return;
+        }
+
+        const bool res = tuneToMemory(memory);
+        if (res)
+        {
+          // If tuning was successful, return the current status
+          sendJsonResponse(request, 200, "");
+          return;
+        }
+        else
+        {
+          // If tuning failed, return an error
+          sendJsonResponse(request, 500, "{\"error\":\"Failed tuning to memory\"}");
+          return;
+        }
+      }
+
+      // Check if this is a memory removal request
+      if (request->method() == HTTP_DELETE && url.startsWith("/api/memory/") && url.length() > 12)
+      {
+        String memoryIdxStr = url.substring(12); // Remove "/api/memory/"
+
+        const int memoryIdx = memoryIdxStr.toInt();
+
+        if (memoryIdx >= MEMORY_COUNT || memoryIdx < 0)
+        {
+          sendJsonResponse(request, 400, "{\"error\":\"Invalid memory index\"}");
+          return;
+        }
+
+        memories[memoryIdx].freq = 0;
+        prefsRequestSave(SAVE_MEMORIES, true);
+
+        sendJsonResponse(request, 200, jsonMemory());
+      }
+    },
+    NULL,
+    [] (AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      String url = request->url();
+
+      JsonDocument jsonRequest;
+      DeserializationError error = deserializeJson(jsonRequest, data, len);
+      if (error)
+      {
+        sendJsonResponse(request, 400, "{\"error\":\"Invalid JSON\"}");
+        return;
+      }
+
+      // Check if this is a bulk memory edit request
+      if (request->method() == HTTP_POST && url.startsWith("/api/memory") && url.length() < 13)
+      {
+        if (!jsonRequest.is<JsonArray>())
+        {
+          sendJsonResponse(request, 400, "{\"error\":\"Expected JSON array\"}");
+          return;
+        }
+
+        jsonSetBulkMemory(jsonRequest.as<JsonArray>());
+        prefsRequestSave(SAVE_MEMORIES, true);
+
+        sendJsonResponse(request, 200, jsonMemory());
+      }
+
+      // Check if this is a memory edit request
+      if (request->method() == HTTP_POST && url.startsWith("/api/memory/") && url.length() > 12)
+      {
+        String memoryIdxStr = url.substring(12); // Remove "/api/memory/"
+
+        const int memoryIdx = memoryIdxStr.toInt();
+
+        if (memoryIdx >= MEMORY_COUNT || memoryIdx < 0)
+        {
+          sendJsonResponse(request, 400, "{\"error\":\"Invalid memory index\"}");
+          return;
+        }
+
+        if (!jsonRequest.is<JsonObject>())
+        {
+          sendJsonResponse(request, 400, "{\"error\":\"Expected JSON object\"}");
+          return;
+        }
+
+        jsonSetMemory(memoryIdx, jsonRequest.as<JsonObject>());
+        prefsRequestSave(SAVE_MEMORIES, true);
+
+        sendJsonResponse(request, 200, jsonMemory());
+      }
+  });
+
   server.on("/api/config", HTTP_GET, [] (AsyncWebServerRequest *request) {
     if(!checkApiAuth(request)) {
       return request->requestAuthentication();
@@ -649,9 +834,17 @@ void addApiListeners(AsyncWebServer& server)
 
   server.on("/api", HTTP_OPTIONS, [] (AsyncWebServerRequest *request) {
     String allowedMethods = "GET, OPTIONS";
-    if (request->url() == "/api/status" || request->url() == "/api/config")
+
+    String url = request->url();
+    if (url == "/api/status" ||
+        url == "/api/config" ||
+        url.startsWith("/api/memory/"))
     {
       allowedMethods += ", POST";
+      if (url.startsWith("/api/memory/"))
+      {
+        allowedMethods += ", DELETE";
+      }
     }
 
     AsyncWebServerResponse *response = request->beginResponse(200);

@@ -92,7 +92,7 @@ paths:
       tags:
         - memory
       summary: Get ATS-Mini memories
-      description: Returns all memory slots. Empty objects represent unused slots.
+      description: Returns all non-empty memory slots.
       operationId: getMemory
       responses:
         '200':
@@ -103,7 +103,219 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Memory'
-                description: Array of memory slots, empty objects for unused slots
+                description: Array of non-empty memory slots
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - memory
+      summary: Bulk update memory slots
+      description: Update multiple memory slots at once
+      operationId: setBulkMemory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MemoryUpdate'
+      responses:
+        '200':
+          description: Successfully updated memory slots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Memory'
+        '400':
+          description: Invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/memoryOptions:
+    get:
+      tags:
+        - memory
+      summary: Get memory configuration options
+      description: Returns memory configuration information like total memory slot count
+      operationId: getMemoryOptions
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemoryOptions'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/memory/{memoryIdx}:
+    post:
+      tags:
+        - memory
+      summary: Update a specific memory slot
+      operationId: setMemory
+      parameters:
+        - name: memoryIdx
+          in: path
+          required: true
+          description: Memory slot index to update
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 98
+            example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemoryUpdate'
+      responses:
+        '200':
+          description: Successfully updated memory slot
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Memory'
+        '400':
+          description: Invalid memory index or invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - memory
+      summary: Clear a memory slot
+      operationId: clearMemory
+      parameters:
+        - name: memoryIdx
+          in: path
+          required: true
+          description: Memory slot index to clear
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 98
+            example: 5
+      responses:
+        '200':
+          description: Successfully cleared memory slot
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Memory'
+        '400':
+          description: Invalid memory index
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/memory/{memoryIdx}/storeCurrent:
+    post:
+      tags:
+        - memory
+      summary: Store current frequency to a memory slot
+      operationId: storeCurrentToMemory
+      parameters:
+        - name: memoryIdx
+          in: path
+          required: true
+          description: Memory slot index to store to
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 98
+            example: 5
+      responses:
+        '200':
+          description: Successfully stored to memory slot
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Memory'
+        '400':
+          description: Invalid memory index or memory slot is not empty
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/memory/{memoryIdx}/tune:
+    post:
+      tags:
+        - memory
+      summary: Tune to a memory slot
+      operationId: tuneToMemory
+      parameters:
+        - name: memoryIdx
+          in: path
+          required: true
+          description: Memory slot index to tune to
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 98
+            example: 5
+      responses:
+        '200':
+          description: Successfully tuned to memory slot
+        '400':
+          description: Invalid memory index or memory slot is empty
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          description: Failed tuning to memory
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         default:
           description: Unexpected error
           content:
@@ -543,6 +755,12 @@ components:
     Memory:
       type: object
       description: Memory slot data. Empty objects represent unused slots.
+      required:
+        - id
+        - freq
+        - modeIdx
+        - bandIdx
+        - name
       properties:
         id:
           type: integer
@@ -552,18 +770,58 @@ components:
           type: number
           description: Frequency in Hz
           example: 94200000
-        band:
-          type: string
-          description: Band name
-          example: "VHF"
-        mode:
-          type: string
-          description: Modulation mode
-          example: "FM"
+        bandIdx:
+          type: integer
+          description: Band index (references bands array from statusOptions)
+          example: 0
+        modeIdx:
+          type: integer
+          description: Modulation mode index (references modes array from statusOptions)
+          example: 0
         name:
           type: string
           description: Memory name
           example: "Example"
+
+    MemoryUpdate:
+      type: object
+      required:
+        - id
+        - freq
+        - modeIdx
+        - bandIdx
+        - name
+      properties:
+        id:
+          type: integer
+          description: Memory slot ID
+          example: 0
+        freq:
+          type: number
+          description: Frequency in Hz
+          example: 94200000
+        bandIdx:
+          type: integer
+          description: Band index (references bands array from statusOptions)
+          example: 0
+        modeIdx:
+          type: integer
+          description: Modulation mode index (references modes array from statusOptions)
+          example: 0
+        name:
+          type: string
+          description: Memory name
+          example: "Example"
+
+    MemoryOptions:
+      type: object
+      required:
+        - size
+      properties:
+        size:
+          type: integer
+          description: Total number of memory slots available
+          example: 99
 
     Config:
       type: object
