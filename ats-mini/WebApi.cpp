@@ -373,6 +373,46 @@ void addApiListeners(AsyncWebServer& server)
     sendJsonResponse(request, 200, jsonMemory());
   });
 
+
+  server.on("/api/memory", HTTP_POST, [] (AsyncWebServerRequest *request) {
+    String url = request->url();
+
+    // Check if this is a memory tune request
+    if (url.startsWith("/api/memory/") && url.endsWith("/tune"))
+    {
+      String memoryIdxStr = url.substring(12); // Remove "/api/memory/"
+      memoryIdxStr = memoryIdxStr.substring(0, memoryIdxStr.length() - 5); // Remove "/tune"
+
+      const int memoryIdx = memoryIdxStr.toInt();
+
+      if (memoryIdx >= MEMORY_COUNT || memoryIdx < 0)
+      {
+        sendJsonResponse(request, 400, "{\"error\":\"Invalid memory index\"}");
+        return;
+      }
+
+      const Memory *memory = &memories[memoryIdx];
+
+      if(!memory->freq)
+      {
+        sendJsonResponse(request, 400, "{\"error\":\"Memory slot is empty\"}");
+        return;
+      }
+
+      const bool res = tuneToMemory(memory);
+      if (res)
+      {
+        // If tuning was successful, return the current status
+        sendJsonResponse(request, 200, "");
+      }
+      else
+      {
+        // If tuning failed, return an error
+        sendJsonResponse(request, 400, "{\"error\":\"Failed tuning to memory\"}");
+      }
+    }
+  });
+
   server.on("/api/config", HTTP_GET, [] (AsyncWebServerRequest *request) {
     if(!checkApiAuth(request)) {
       return request->requestAuthentication();

@@ -59,6 +59,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/memory/{memoryIdx}/tune:
+    post:
+      tags:
+        - memory
+      summary: Tune to a memory slot
+      operationId: tuneToMemory
+      parameters:
+        - name: memoryIdx
+          in: path
+          required: true
+          description: Memory slot index to tune to
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 31
+            example: 5
+      responses:
+        '200':
+          description: Successfully tuned to memory slot
+        '400':
+          description: Invalid memory index or memory slot is empty
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /api/config:
     get:
