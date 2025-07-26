@@ -1,4 +1,4 @@
-import type {Config, ConfigOptions, Memory, Status, StatusOptions} from "./types.ts";
+import type {Config, ConfigOptions, Memory, MemoryOptions, Status, StatusOptions} from "./types.ts";
 
 const responseToJson = async (response: Response) => {
   if (!response.ok) {
@@ -8,7 +8,7 @@ const responseToJson = async (response: Response) => {
   return response.json();
 }
 
-const requestToJsonInit = (element: Partial<Status> | Config): RequestInit => ({
+const requestToJsonInit = (element: Partial<Status> | Memory | Config): RequestInit => ({
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -30,6 +30,16 @@ export const saveStatusApi = (status: Partial<Status>): Promise<Status> => jsonF
 export const statusOptionsApi = (): Promise<StatusOptions> => jsonFetch('/api/statusOptions')
 
 export const memoriesApi = (): Promise<Memory[]> => jsonFetch('/api/memory')
+
+export const clearMemoryApi = (id: number): Promise<Memory[]> => jsonFetch(`/api/memory/${id}`, {method: 'DELETE'})
+
+export const tuneMemoryApi = (id: number): Promise<Memory[]> => jsonFetch(`/api/memory/${id}/tune`, {method: 'POST'})
+
+export const storeMemoryApi = (id: number): Promise<Memory[]> => jsonFetch(`/api/memory/${id}/storeCurrent`, {method: 'POST'})
+
+export const saveMemoryApi = (memory: Memory): Promise<Memory[]> => jsonFetch(`/api/memory/${memory.id}`, requestToJsonInit(memory))
+
+export const memoriesOptionsApi = (): Promise<MemoryOptions> => jsonFetch('/api/memoryOptions')
 
 export const configApi = (): Promise<Config> => jsonFetch('/api/config')
 

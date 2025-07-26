@@ -27,11 +27,15 @@ export interface Status {
 }
 
 export interface Memory {
-  id?: number;
-  freq?: number;
-  band?: string;
-  mode?: string;
-  name?: string;
+  id: number;
+  freq: number;
+  bandIdx: number;
+  modeIdx: number;
+  name: string;
+}
+
+export interface MemoryOptions {
+  size: number;
 }
 
 export interface UTCOffset {
