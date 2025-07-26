@@ -7,19 +7,34 @@ const populateMemories = (memories: Memory[]) => {
   memoriesTable.innerHTML = '';
 
   memories.forEach((memory, idx) => {
+    const slotIsEmpty = memory.freq === undefined;
+
     const tr = document.createElement('tr');
 
     const tdIndex = document.createElement('td');
     tdIndex.className = 'LABEL';
     tdIndex.setAttribute('width', '10%');
-    tdIndex.textContent = (idx + 1).toString().padStart(2, '0');
+    if (slotIsEmpty) {
+      tdIndex.textContent = (idx + 1).toString().padStart(2, '0');
+    } else {
+      const tuneLink = document.createElement('a');
+      tuneLink.href = '#'
+      tuneLink.textContent = (idx + 1).toString().padStart(2, '0');
+      tuneLink.addEventListener('click', () => {
+        fetch(`/api/memory/${idx}/tune`, {method: 'POST'})
+          .catch(error => {
+            console.error('Error tuning:', error);
+          });
+      })
+      tdIndex.appendChild(tuneLink)
+    }
     tr.appendChild(tdIndex);
 
     const tdValue = document.createElement('td');
-    if (!memory.freq) {
+    if (slotIsEmpty) {
       tdValue.innerHTML = '&nbsp;---&nbsp;';
     } else {
-      let freqStr = formatFrequency(memory.freq, memory.mode);
+      let freqStr = formatFrequency(memory.freq ?? 0, memory.mode);
       if (memory.mode) freqStr += ' ' + memory.mode;
       tdValue.textContent = freqStr;
     }
