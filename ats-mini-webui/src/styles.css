@@ -48,3 +48,28 @@ SELECT {
 .hidden {
     display: none;
 }
+
+.memory-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.5em;
+}
+
+.memory-actions button {
+    width: 2em;
+    height: 2em;
+}
+
+.memory-edit-div {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    padding: 1em;
+    border: 1px grey;
+    border-style: solid none;
+}
+
+.memory-edit-div.hidden {
+    display: none;
+}
