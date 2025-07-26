@@ -111,6 +111,120 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  /api/memory/{memoryIdx}/storeCurrent:
+    post:
+      tags:
+        - memory
+      summary: Store current frequency to a memory slot
+      operationId: storeCurrentToMemory
+      parameters:
+        - name: memoryIdx
+          in: path
+          required: true
+          description: Memory slot index to store to
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 98
+            example: 5
+      responses:
+        '200':
+          description: Successfully stored to memory slot
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Memory'
+        '400':
+          description: Invalid memory index or memory slot is not empty
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/memory/{memoryIdx}/tune:
+    post:
+      tags:
+        - memory
+      summary: Tune to a memory slot
+      operationId: tuneToMemory
+      parameters:
+        - name: memoryIdx
+          in: path
+          required: true
+          description: Memory slot index to tune to
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 98
+            example: 5
+      responses:
+        '200':
+          description: Successfully tuned to memory slot
+        '400':
+          description: Invalid memory index or memory slot is empty
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          description: Failed tuning to memory
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/memory/{memoryIdx}:
+    delete:
+      tags:
+        - memory
+      summary: Clear a memory slot
+      operationId: clearMemory
+      parameters:
+        - name: memoryIdx
+          in: path
+          required: true
+          description: Memory slot index to clear
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 98
+            example: 5
+      responses:
+        '200':
+          description: Successfully cleared memory slot
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Memory'
+        '400':
+          description: Invalid memory index
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
   /api/config:
     get:
       tags:
