@@ -127,6 +127,7 @@ int getTotalUiLayouts();
 int getTotalWifiModes();
 int getTotalBleModes();
 
+bool tuneToMemory(const Memory *memory);
 void doSoftMute(int dir);
 void doAgc(int dir);
 void doAvc(int dir);
