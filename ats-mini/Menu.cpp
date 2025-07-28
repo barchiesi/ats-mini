@@ -260,8 +260,10 @@ int getTotalBleModes() { return(ITEM_COUNT(bleModeDesc)); }
 //
 
 uint8_t wifiModeIdx = NET_OFF;
-static const char *wifiModeDesc[] =
+const char *wifiModeDesc[] =
 { "Off", "AP Only", "AP+Connect", "Connect", "Sync Only" };
+
+int getTotalWifiModes() { return(ITEM_COUNT(wifiModeDesc)); }
 
 //
 // Step Menu

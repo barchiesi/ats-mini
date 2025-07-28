@@ -378,6 +378,7 @@ const String jsonConfig()
   config["zoomMenu"] = zoomMenu;
   config["scrollDirection"] = scrollDirection;
   config["sleepModeIdx"] = sleepModeIdx;
+  config["wifiModeIdx"] = wifiModeIdx;
 
   String json;
   serializeJson(doc, json);
@@ -495,6 +496,13 @@ void jsonSetConfig(JsonDocument request)
     prefsSave |= SAVE_SETTINGS;
   }
 
+  if(request["wifiModeIdx"].is<int>())
+  {
+    wifiModeIdx = request["wifiModeIdx"];
+    netInit(wifiModeIdx);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
   // Save preferences immediately
   prefsRequestSave(prefsSave, true);
 
@@ -558,6 +566,14 @@ const String jsonConfigOptions()
     JsonObject sleepModeObj = sleepModes.add<JsonObject>();
     sleepModeObj["id"] = i;
     sleepModeObj["name"] = sleepModeDesc[i];
+  }
+
+  JsonArray wifiModes = doc["wifiModes"].to<JsonArray>();
+  for(int i = 0; i < getTotalWifiModes(); i++)
+  {
+    JsonObject wifiModeObj = wifiModes.add<JsonObject>();
+    wifiModeObj["id"] = i;
+    wifiModeObj["name"] = wifiModeDesc[i];
   }
 
   String json;
