@@ -85,6 +85,7 @@ extern Memory memories[];
 extern const char *sleepModeDesc[];
 extern const UTCOffset utcOffsets[];
 extern const char *uiLayoutDesc[];
+extern const char *wifiModeDesc[];
 extern const char *bandModeDesc[];
 extern const FMRegion fmRegions[];
 extern const RDSMode rdsMode[];
@@ -124,6 +125,7 @@ int getCurrentUTCOffset();
 int getTotalUTCOffsets();
 int getTotalFmRegions();
 int getTotalUiLayouts();
+int getTotalWifiModes();
 int getTotalBleModes();
 
 bool tuneToMemory(const Memory *memory);

@@ -30,6 +30,7 @@ const saveConfig = () => {
     zoomMenu: checkboxValue('zoom'),
     scrollDirection: checkboxValue('scroll') ? -1 : 1,
     sleepModeIdx: parseInt(inputValue('sleepModes')),
+    wifiModeIdx: parseInt(inputValue('wifiModes')),
   };
 
   fetch('/api/config', {
@@ -75,6 +76,7 @@ const populateConfig = (config: Config) => {
   setCheckboxValue('zoom', config.zoomMenu);
   setCheckboxValue('scroll', config.scrollDirection === -1);
   setInputValue('sleepModes', config.sleepModeIdx.toString());
+  setInputValue('wifiModes', config.wifiModeIdx.toString());
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -105,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
       populateSelect('theme', configOptions.themes.map(t => ({value: t.id.toString(), label: t.name})));
       populateSelect('uiLayouts', configOptions.uiLayouts.map(t => ({value: t.id.toString(), label: t.name})));
       populateSelect('sleepModes', configOptions.sleepModes.map(t => ({value: t.id.toString(), label: t.name})));
+      populateSelect('wifiModes', configOptions.wifiModes.map(t => ({value: t.id.toString(), label: t.name})));
 
       populateConfig(config);
     })
