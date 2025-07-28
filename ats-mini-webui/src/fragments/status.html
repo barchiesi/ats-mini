@@ -1,0 +1,97 @@
+<TABLE COLUMNS=2>
+    <TR>
+        <TD CLASS='LABEL'>Time</TD>
+        <TD id="time"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>IP Address</TD>
+        <TD><A HREF='/' id="ip"></A> (<span id="ssid"></span>)</TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>MAC Address</TD>
+        <TD id="mac"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Firmware</TD>
+        <TD id="version"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Band</TD>
+        <TD>
+            <SELECT ID='bands' NAME='bands'></SELECT>
+        </TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Frequency</TD>
+        <TD>
+            <span id="frequencyDisplay"></span>
+            <input class="hidden" id="frequency" type="number"/>
+            <span id="frequencyUnit"></span>
+            <button id="frequencyEditButton">✎</button>
+            <button class="hidden" id="frequencyConfirmButton">✓</button>
+            <button class="hidden" id="frequencyCancelButton">🗙</button>
+        </TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Signal Strength</TD>
+        <TD id="rssi"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Signal to Noise</TD>
+        <TD id="snr"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Battery Voltage</TD>
+        <TD id="battery"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Step</TD>
+        <TD id="step"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Bandwidth</TD>
+        <TD id="bandwidth"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>AGC/Attenuation</TD>
+        <TD>
+            <SPAN id="agcAttenuationValue" style="display: inline-block; min-width: 4em">---</SPAN>
+            <INPUT id="agcAttenuation" max="26" min="-1" type="range" value="-1">
+        </TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Volume</TD>
+        <TD>
+            <SPAN id="volumeValue" style="display: inline-block; min-width: 4em">---</SPAN>
+            <INPUT id="volume" max="63" min="0" type="range" value="30">
+        </TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Squelch</TD>
+        <TD id="squelch"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Soft Mute Idx</TD>
+        <TD id="softMuteMaxAttIdx"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>AVC</TD>
+        <TD id="avc"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>RDS PI Code</TD>
+        <TD id="piCode"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>RDS Station name</TD>
+        <TD id="stationName"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>RDS Radio text</TD>
+        <TD id="radioText"></TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>RDS Program info</TD>
+        <TD id="programInfo"></TD>
+    </TR>
+</TABLE>

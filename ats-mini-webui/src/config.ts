@@ -77,7 +77,7 @@ const populateConfig = (config: Config) => {
   setInputValue('sleepModes', config.sleepModeIdx.toString());
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+export const init = (): (() => void) => {
   const configForm = byId('configForm') as HTMLFormElement;
   if (configForm) {
     configForm.addEventListener('submit', (e) => {
@@ -111,4 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(error => {
       console.error('Error fetching config:', error);
     });
-});
+
+  return () => {
+  }
+};

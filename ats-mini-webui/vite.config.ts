@@ -28,20 +28,23 @@ export default defineConfig({
     emptyOutDir: true,
     minify: 'esbuild',
     rollupOptions: {
-      input: {
-        status: path.resolve(__dirname, 'src/index.html'),
-        memory: path.resolve(__dirname, 'src/memory.html'),
-        config: path.resolve(__dirname, 'src/config.html')
+      /*
+        input: {
+          status: path.resolve(__dirname, 'src/index.html'),
+          memory: path.resolve(__dirname, 'src/memory.html'),
+          config: path.resolve(__dirname, 'src/config.html')
+        },
+       */
+        output: {
+          entryFileNames: '[name].js',
+          chunkFileNames: '[name].js',
+          assetFileNames: '[name][extname]',
+          dir: path.resolve(__dirname, 'dist'),
+        }
       },
-      output: {
-        entryFileNames: '[name].js',
-        chunkFileNames: '[name].js',
-        assetFileNames: '[name][extname]',
-        dir: path.resolve(__dirname, 'dist'),
-      }
-    },
   },
   plugins: [
+    /*
     {
       name: 'html-rewrite',
       configureServer(server) {
@@ -55,6 +58,7 @@ export default defineConfig({
         });
       }
     },
+    */
     {
       name: 'mock-api',
       configureServer(server) {

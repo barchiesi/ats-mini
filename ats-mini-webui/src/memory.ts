@@ -55,10 +55,17 @@ const fetchAndPopulateMemories = () => {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+export const init = (): (() => void) => {
   // Initial fetch
   fetchAndPopulateMemories();
 
   // Repeat every 5 seconds
   setInterval(fetchAndPopulateMemories, 5000);
-});
+
+  // Repeat every 1 second
+  const interval = setInterval(fetchAndPopulateMemories, 5000);
+  return () => {
+    console.log('deinit memory')
+    clearInterval(interval)
+  }
+};

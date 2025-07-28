@@ -83,7 +83,7 @@ const fetchAndPopulateStatus = () => {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+export const init = (): (() => void) => {
   const bandSelect = byId('bands') as HTMLInputElement;
   if (bandSelect) {
     bandSelect.addEventListener('change', () => {
@@ -206,9 +206,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Initial fetch and repeat
       fetchAndPopulateStatus();
-      setInterval(fetchAndPopulateStatus, 1000);
     })
     .catch(error => {
       console.error('Error fetching status options:', error);
     });
-})
+
+  // Repeat every 1 second
+  const interval = setInterval(fetchAndPopulateStatus, 1000);
+  return () => {
+    console.log('deinit status')
+    clearInterval(interval)
+  }
+}
