@@ -72,6 +72,11 @@ export interface SleepMode {
   name: string;
 }
 
+interface WifiMode {
+  id: number;
+  name: string;
+}
+
 export interface ConfigOptions {
   rdsModes: RdsMode[];
   UTCOffsets: UTCOffset[];
@@ -79,6 +84,7 @@ export interface ConfigOptions {
   themes: Theme[];
   uiLayouts: UiLayout[];
   sleepModes: SleepMode[];
+  wifiModes: WifiMode[];
 }
 
 export interface Config {
@@ -100,6 +106,7 @@ export interface Config {
   zoomMenu: boolean;
   scrollDirection: number;
   sleepModeIdx: number;
+  wifiModeIdx: number;
 }
 
 interface Band {

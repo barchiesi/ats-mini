@@ -844,6 +844,7 @@ components:
         - zoomMenu
         - scrollDirection
         - sleepModeIdx
+        - wifiModeIdx
       properties:
         username:
           type: string
@@ -918,6 +919,9 @@ components:
           type: number
           description: Sleep mode index (references sleepModes array from configOptions)
           example: 0
+        wifiModeIdx:
+          type: number
+          example: 3
 
     ConfigUpdate:
       type: object
@@ -988,6 +992,7 @@ components:
         - themes
         - uiLayouts
         - sleepModes
+        - wifiModes
       properties:
         rdsModes:
           type: array
@@ -1019,6 +1024,11 @@ components:
           description: Available device sleep mode options
           items:
             $ref: '#/components/schemas/SleepMode'
+        wifiModes:
+          type: array
+          description: Available device wifi mode options
+          items:
+            $ref: '#/components/schemas/WifiMode'
 
     RdsMode:
       type: object
@@ -1129,6 +1139,19 @@ components:
           type: string
           description: Sleep mode name
           example: "Locked"
+
+    WifiMode:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: number
+          example: 3
+        name:
+          type: string
+          example: "Connect"
 
     Error:
       type: object
