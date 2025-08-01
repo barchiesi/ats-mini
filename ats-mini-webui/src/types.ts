@@ -3,12 +3,27 @@ export interface Status {
   ssid: string;
   mac: string;
   version: string;
-  band: string;
+  bandIdx: number;
   freq: number;
-  mode: string;
+  modeIdx: number;
   rssi: number;
   snr: number;
   battery: number;
+  stepIdx: number;
+  bandwidthIdx: number;
+  agc: boolean;
+  attenuation?: number;
+  time?: string;
+  volume: number;
+  squelch: number;
+  softMuteMaxAttIdx?: number;
+  avc?: number;
+  rds?: {
+    piCode?: string;
+    stationName?: string;
+    radioText?: string;
+    programInfo?: string;
+  }
 }
 
 export interface Memory {
@@ -49,4 +64,50 @@ export interface Config {
   themeIdx: number;
   scrollDirection: number;
   zoomMenu: boolean;
+}
+
+interface Band {
+  id: number;
+  name: string;
+  type: number;
+  modeIdx: number;
+  minimumFreq: number;
+  maximumFreq: number;
+  currentFreq: number;
+  currentStepIdx: number;
+  bandwidthIdx: number;
+  bandCal: number;
+}
+
+export interface Step {
+  id: number;
+  step: number;
+  desc: string;
+  spacing: number;
+}
+
+export interface Bandwidth {
+  id: number;
+  idx: number;
+  desc: string;
+}
+
+export interface Mode {
+  id: number;
+  mode: string;
+}
+
+export interface StatusOptions {
+  bands: Band[]
+  steps: {
+    fm: Step[]
+    ssb: Step[]
+    am: Step[]
+  }
+  bandwidths: {
+    fm: Bandwidth[]
+    ssb: Bandwidth[]
+    am: Bandwidth[]
+  }
+  modes: Mode[]
 }
