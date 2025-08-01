@@ -2,11 +2,23 @@
   "ip": "10.1.1.1",
   "ssid": "ATS-Mini",
   "mac": "98:A3:16:C1:DA:9C",
-  "version": "F/W: v2.28d Jul 27 2025",
-  "band": "VHF",
+  "version": "F/W: v2.30d Aug 22 2025",
+  "bandIdx": 0,
   "freq": 94200000,
-  "mode": "FM",
+  "modeIdx": 0,
   "rssi": 44,
   "snr": 20,
-  "battery": 3.878347
+  "battery": 3.878347,
+  "stepIdx": 2,
+  "bandwidthIdx": 0,
+  "agc": true,
+  "time": "16:13",
+  "volume": 35,
+  "squelch": 0,
+  "rds": {
+    "piCode": "5241",
+    "stationName": " VIRGIN ",
+    "radioText": "Virgin Radio \"Style Rock\"",
+    "programInfo": "Rock Music"
+  }
 }
