@@ -77,9 +77,35 @@
         <TH CLASS='HEADING' COLSPAN=2>Settings</TH>
     </TR>
     <TR>
-        <TD CLASS='LABEL'>Time Zone</TD>
+        <TD CLASS='LABEL'>Brightness</TD>
+        <TD>
+            <SPAN id="brightnessValue" style="display: inline-block; min-width: 3em">---</SPAN>
+            <INPUT id="brightness" max="255" min="10" step="5" type="range" value="130">
+        </TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Calibration</TD>
+        <TD>
+            <SPAN id="calibrationValue" style="display: inline-block; min-width: 3em">---</SPAN>
+            <INPUT id="calibration" max="2000" min="-2000" step="10" type="range" value="0">
+        </TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>RDS</TD>
+        <TD>
+            <SELECT ID='rdsModes' NAME='rdsModes'></SELECT>
+        </TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>UTC Offset</TD>
         <TD>
             <SELECT ID='utcoffset' NAME='utcoffset'></SELECT>
+        </TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>FM Region</TD>
+        <TD>
+            <SELECT ID='fmRegions' NAME='fmRegions'></SELECT>
         </TD>
     </TR>
     <TR>
@@ -89,15 +115,27 @@
         </TD>
     </TR>
     <TR>
-        <TD CLASS='LABEL'>Reverse Scrolling</TD>
+        <TD CLASS='LABEL'>UI Layout</TD>
+        <TD>
+            <SELECT ID='uiLayouts' NAME='uiLayouts'></SELECT>
+        </TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Scroll Direction</TD>
         <TD>
             <INPUT ID='scroll' NAME='scroll' TYPE='CHECKBOX' VALUE='on'>
         </TD>
     </TR>
     <TR>
-        <TD CLASS='LABEL'>Zoomed Menu</TD>
+        <TD CLASS='LABEL'>Zoom Menu</TD>
         <TD>
             <INPUT ID='zoom' NAME='zoom' TYPE='CHECKBOX' VALUE='on'>
+        </TD>
+    </TR>
+    <TR>
+        <TD CLASS='LABEL'>Sleep Mode</TD>
+        <TD>
+            <SELECT ID='sleepModes' NAME='sleepModes'></SELECT>
         </TD>
     </TR>
     <TR>
