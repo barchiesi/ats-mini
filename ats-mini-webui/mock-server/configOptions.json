@@ -1,40 +1,44 @@
 {
-  "themes": [
+  "rdsModes": [
     {
       "id": 0,
-      "name": "Default"
+      "mode": 1,
+      "desc": "PS"
     },
     {
       "id": 1,
-      "name": "Bluesky"
+      "mode": 3,
+      "desc": "PS+CT"
     },
     {
       "id": 2,
-      "name": "eInk"
+      "mode": 5,
+      "desc": "PS+PI"
     },
     {
       "id": 3,
-      "name": "Pager"
+      "mode": 7,
+      "desc": "PS+PI+CT"
     },
     {
       "id": 4,
-      "name": "Orange"
+      "mode": 29,
+      "desc": "ALL-CT (EU)"
     },
     {
       "id": 5,
-      "name": "Night"
+      "mode": 61,
+      "desc": "ALL-CT (US)"
     },
     {
       "id": 6,
-      "name": "Phosphor"
+      "mode": 31,
+      "desc": "ALL (EU)"
     },
     {
       "id": 7,
-      "name": "Space"
-    },
-    {
-      "id": 8,
-      "name": "Magenta"
+      "mode": 63,
+      "desc": "ALL (US)"
     }
   ],
   "UTCOffsets": [
@@ -157,6 +161,80 @@
       "offset": 40,
       "desc": "UTC+10",
       "city": "Vladivostok"
+    }
+  ],
+  "fmRegions": [
+    {
+      "id": 0,
+      "value": 1,
+      "desc": "EU/JP/AU"
+    },
+    {
+      "id": 1,
+      "value": 2,
+      "desc": "US"
+    }
+  ],
+  "themes": [
+    {
+      "id": 0,
+      "name": "Default"
+    },
+    {
+      "id": 1,
+      "name": "Bluesky"
+    },
+    {
+      "id": 2,
+      "name": "eInk"
+    },
+    {
+      "id": 3,
+      "name": "Pager"
+    },
+    {
+      "id": 4,
+      "name": "Orange"
+    },
+    {
+      "id": 5,
+      "name": "Night"
+    },
+    {
+      "id": 6,
+      "name": "Phosphor"
+    },
+    {
+      "id": 7,
+      "name": "Space"
+    },
+    {
+      "id": 8,
+      "name": "Magenta"
+    }
+  ],
+  "uiLayouts": [
+    {
+      "id": 0,
+      "name": "Default"
+    },
+    {
+      "id": 1,
+      "name": "S-Meter"
+    }
+  ],
+  "sleepModes": [
+    {
+      "id": 0,
+      "name": "Locked"
+    },
+    {
+      "id": 1,
+      "name": "Unlocked"
+    },
+    {
+      "id": 2,
+      "name": "CPU Sleep"
     }
   ]
 }

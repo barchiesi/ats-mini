@@ -7,8 +7,14 @@
   "wifipass2": "",
   "wifissid3": "",
   "wifipass3": "",
-  "utcOffsetIdx": 8,
-  "themeIdx": 0,
+  "brightness": 60,
+  "calibration": 0,
+  "rdsModeIdx": 4,
+  "utcOffsetIdx": 10,
+  "fmRegionIdx": 0,
+  "themeIdx": 5,
+  "uiLayoutIdx": 0,
+  "zoomMenu": false,
   "scrollDirection": 1,
-  "zoomMenu": false
+  "sleepModeIdx": 0
 }

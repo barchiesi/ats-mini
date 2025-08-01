@@ -1,0 +1,590 @@
+{
+  "bands": [
+    {
+      "id": 0,
+      "name": "VHF",
+      "type": 0,
+      "modeIdx": 0,
+      "minimumFreq": 64000000,
+      "maximumFreq": 108000000,
+      "currentFreq": 87600000,
+      "currentStepIdx": 2,
+      "bandwidthIdx": 0,
+      "bandCal": 0
+    },
+    {
+      "id": 1,
+      "name": "ALL",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 150000,
+      "maximumFreq": 30000000,
+      "currentFreq": 15000000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 2,
+      "name": "11M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 25600000,
+      "maximumFreq": 26100000,
+      "currentFreq": 25850000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 3,
+      "name": "13M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 21500000,
+      "maximumFreq": 21900000,
+      "currentFreq": 21650000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 4,
+      "name": "15M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 18900000,
+      "maximumFreq": 19100000,
+      "currentFreq": 18950000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 5,
+      "name": "16M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 17400000,
+      "maximumFreq": 18100000,
+      "currentFreq": 17650000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 6,
+      "name": "19M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 15100000,
+      "maximumFreq": 15900000,
+      "currentFreq": 15450000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 7,
+      "name": "22M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 13500000,
+      "maximumFreq": 13900000,
+      "currentFreq": 13650000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 8,
+      "name": "25M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 11000000,
+      "maximumFreq": 13000000,
+      "currentFreq": 11850000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 9,
+      "name": "31M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 9000000,
+      "maximumFreq": 11000000,
+      "currentFreq": 9650000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 10,
+      "name": "41M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 7000000,
+      "maximumFreq": 9000000,
+      "currentFreq": 7300000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 11,
+      "name": "49M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 5000000,
+      "maximumFreq": 7000000,
+      "currentFreq": 6000000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 12,
+      "name": "60M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 4000000,
+      "maximumFreq": 5100000,
+      "currentFreq": 4950000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 13,
+      "name": "75M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 3500000,
+      "maximumFreq": 4000000,
+      "currentFreq": 3950000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 14,
+      "name": "90M",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 3000000,
+      "maximumFreq": 3500000,
+      "currentFreq": 3300000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 15,
+      "name": "MW3",
+      "type": 1,
+      "modeIdx": 3,
+      "minimumFreq": 1700000,
+      "maximumFreq": 3500000,
+      "currentFreq": 2500000,
+      "currentStepIdx": 1,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 16,
+      "name": "MW2",
+      "type": 1,
+      "modeIdx": 3,
+      "minimumFreq": 495000,
+      "maximumFreq": 1701000,
+      "currentFreq": 783000,
+      "currentStepIdx": 2,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 17,
+      "name": "MW1",
+      "type": 1,
+      "modeIdx": 3,
+      "minimumFreq": 150000,
+      "maximumFreq": 1800000,
+      "currentFreq": 810000,
+      "currentStepIdx": 3,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 18,
+      "name": "160M",
+      "type": 1,
+      "modeIdx": 1,
+      "minimumFreq": 1800000,
+      "maximumFreq": 2000000,
+      "currentFreq": 1900000,
+      "currentStepIdx": 5,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 19,
+      "name": "80M",
+      "type": 2,
+      "modeIdx": 1,
+      "minimumFreq": 3500000,
+      "maximumFreq": 4000000,
+      "currentFreq": 3800000,
+      "currentStepIdx": 5,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 20,
+      "name": "40M",
+      "type": 2,
+      "modeIdx": 1,
+      "minimumFreq": 7000000,
+      "maximumFreq": 7300000,
+      "currentFreq": 7150000,
+      "currentStepIdx": 5,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 21,
+      "name": "30M",
+      "type": 2,
+      "modeIdx": 1,
+      "minimumFreq": 10000000,
+      "maximumFreq": 10200000,
+      "currentFreq": 10125000,
+      "currentStepIdx": 5,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 22,
+      "name": "20M",
+      "type": 2,
+      "modeIdx": 2,
+      "minimumFreq": 14000000,
+      "maximumFreq": 14400000,
+      "currentFreq": 14100000,
+      "currentStepIdx": 5,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 23,
+      "name": "17M",
+      "type": 2,
+      "modeIdx": 2,
+      "minimumFreq": 18000000,
+      "maximumFreq": 18200000,
+      "currentFreq": 18115000,
+      "currentStepIdx": 5,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 24,
+      "name": "15M",
+      "type": 2,
+      "modeIdx": 2,
+      "minimumFreq": 21000000,
+      "maximumFreq": 21500000,
+      "currentFreq": 21225000,
+      "currentStepIdx": 5,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 25,
+      "name": "12M",
+      "type": 2,
+      "modeIdx": 2,
+      "minimumFreq": 24800000,
+      "maximumFreq": 25000000,
+      "currentFreq": 24940000,
+      "currentStepIdx": 5,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 26,
+      "name": "10M",
+      "type": 2,
+      "modeIdx": 2,
+      "minimumFreq": 28000000,
+      "maximumFreq": 29700000,
+      "currentFreq": 28500000,
+      "currentStepIdx": 5,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    },
+    {
+      "id": 27,
+      "name": "CB",
+      "type": 2,
+      "modeIdx": 3,
+      "minimumFreq": 25000000,
+      "maximumFreq": 30000000,
+      "currentFreq": 27135000,
+      "currentStepIdx": 0,
+      "bandwidthIdx": 4,
+      "bandCal": 0
+    }
+  ],
+  "steps": {
+    "fm": [
+      {
+        "id": 0,
+        "step": 1,
+        "desc": "10k",
+        "spacing": 1
+      },
+      {
+        "id": 1,
+        "step": 5,
+        "desc": "50k",
+        "spacing": 5
+      },
+      {
+        "id": 2,
+        "step": 10,
+        "desc": "100k",
+        "spacing": 10
+      },
+      {
+        "id": 3,
+        "step": 20,
+        "desc": "200k",
+        "spacing": 20
+      },
+      {
+        "id": 4,
+        "step": 100,
+        "desc": "1M",
+        "spacing": 10
+      }
+    ],
+    "ssb": [
+      {
+        "id": 0,
+        "step": 10,
+        "desc": "10",
+        "spacing": 1
+      },
+      {
+        "id": 1,
+        "step": 25,
+        "desc": "25",
+        "spacing": 1
+      },
+      {
+        "id": 2,
+        "step": 50,
+        "desc": "50",
+        "spacing": 1
+      },
+      {
+        "id": 3,
+        "step": 100,
+        "desc": "100",
+        "spacing": 1
+      },
+      {
+        "id": 4,
+        "step": 500,
+        "desc": "500",
+        "spacing": 1
+      },
+      {
+        "id": 5,
+        "step": 1000,
+        "desc": "1k",
+        "spacing": 1
+      },
+      {
+        "id": 6,
+        "step": 5000,
+        "desc": "5k",
+        "spacing": 5
+      },
+      {
+        "id": 7,
+        "step": 9000,
+        "desc": "9k",
+        "spacing": 9
+      },
+      {
+        "id": 8,
+        "step": 10000,
+        "desc": "10k",
+        "spacing": 10
+      }
+    ],
+    "am": [
+      {
+        "id": 0,
+        "step": 1,
+        "desc": "1k",
+        "spacing": 1
+      },
+      {
+        "id": 1,
+        "step": 5,
+        "desc": "5k",
+        "spacing": 5
+      },
+      {
+        "id": 2,
+        "step": 9,
+        "desc": "9k",
+        "spacing": 9
+      },
+      {
+        "id": 3,
+        "step": 10,
+        "desc": "10k",
+        "spacing": 10
+      },
+      {
+        "id": 4,
+        "step": 50,
+        "desc": "50k",
+        "spacing": 10
+      },
+      {
+        "id": 5,
+        "step": 100,
+        "desc": "100k",
+        "spacing": 10
+      },
+      {
+        "id": 6,
+        "step": 1000,
+        "desc": "1M",
+        "spacing": 10
+      }
+    ]
+  },
+  "bandwidths": {
+    "fm": [
+      {
+        "id": 0,
+        "idx": 0,
+        "desc": "Auto"
+      },
+      {
+        "id": 1,
+        "idx": 1,
+        "desc": "110k"
+      },
+      {
+        "id": 2,
+        "idx": 2,
+        "desc": "84k"
+      },
+      {
+        "id": 3,
+        "idx": 3,
+        "desc": "60k"
+      },
+      {
+        "id": 4,
+        "idx": 4,
+        "desc": "40k"
+      }
+    ],
+    "ssb": [
+      {
+        "id": 0,
+        "idx": 4,
+        "desc": "0.5k"
+      },
+      {
+        "id": 1,
+        "idx": 5,
+        "desc": "1.0k"
+      },
+      {
+        "id": 2,
+        "idx": 0,
+        "desc": "1.2k"
+      },
+      {
+        "id": 3,
+        "idx": 1,
+        "desc": "2.2k"
+      },
+      {
+        "id": 4,
+        "idx": 2,
+        "desc": "3.0k"
+      },
+      {
+        "id": 5,
+        "idx": 3,
+        "desc": "4.0k"
+      }
+    ],
+    "am": [
+      {
+        "id": 0,
+        "idx": 4,
+        "desc": "1.0k"
+      },
+      {
+        "id": 1,
+        "idx": 5,
+        "desc": "1.8k"
+      },
+      {
+        "id": 2,
+        "idx": 3,
+        "desc": "2.0k"
+      },
+      {
+        "id": 3,
+        "idx": 6,
+        "desc": "2.5k"
+      },
+      {
+        "id": 4,
+        "idx": 2,
+        "desc": "3.0k"
+      },
+      {
+        "id": 5,
+        "idx": 1,
+        "desc": "4.0k"
+      },
+      {
+        "id": 6,
+        "idx": 0,
+        "desc": "6.0k"
+      }
+    ]
+  },
+  "modes": [
+    {
+      "id": 0,
+      "mode": "FM"
+    },
+    {
+      "id": 1,
+      "mode": "LSB"
+    },
+    {
+      "id": 2,
+      "mode": "USB"
+    },
+    {
+      "id": 3,
+      "mode": "AM"
+    }
+  ]
+}
