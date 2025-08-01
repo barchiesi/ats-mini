@@ -44,3 +44,7 @@ INPUT[type=submit] {
 .CENTER {
     text-align: center;
 }
+
+.hidden {
+    display: none;
+}

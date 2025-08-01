@@ -3,7 +3,7 @@ export interface Status {
   ssid: string;
   mac: string;
   version: string;
-  band: string;
+  bandIdx: number;
   freq: number;
   mode: string;
   rssi: number;
@@ -94,4 +94,21 @@ export interface Config {
   zoomMenu: boolean;
   scrollDirection: number;
   sleepModeIdx: number;
+}
+
+interface Band {
+  id: number;
+  bandName: string;
+  bandType: number;
+  bandMode: number;
+  minimumFreq: number;
+  maximumFreq: number;
+  currentFreq: number;
+  currentStepIdx: number;
+  bandwidthIdx: number;
+  bandCal: number;
+}
+
+export interface StatusOptions {
+  bands: Band[]
 }

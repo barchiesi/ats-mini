@@ -30,11 +30,20 @@
     </TR>
     <TR>
         <TD CLASS='LABEL'>Band</TD>
-        <TD id="band"></TD>
+        <TD>
+            <SELECT ID='bands' NAME='bands'></SELECT>
+        </TD>
     </TR>
     <TR>
         <TD CLASS='LABEL'>Frequency</TD>
-        <TD id="frequency"></TD>
+        <TD>
+            <span id="frequencyDisplay"></span>
+            <input class="hidden" id="frequency" type="number"/>
+            <span id="frequencyUnit"></span>
+            <button id="frequencyEditButton">✎</button>
+            <button class="hidden" id="frequencyConfirmButton">✓</button>
+            <button class="hidden" id="frequencyCancelButton">🗙</button>
+        </TD>
     </TR>
     <TR>
         <TD CLASS='LABEL'>Signal Strength</TD>
@@ -57,16 +66,18 @@
         <TD id="bandwidth"></TD>
     </TR>
     <TR>
-        <TD CLASS='LABEL'>AGC</TD>
-        <TD id="agc"></TD>
-    </TR>
-    <TR>
-        <TD CLASS='LABEL'>Attenuation</TD>
-        <TD id="attenuation"></TD>
+        <TD CLASS='LABEL'>AGC/Attenuation</TD>
+        <TD>
+            <SPAN id="agcAttenuationValue" style="display: inline-block; min-width: 4em">---</SPAN>
+            <INPUT id="agcAttenuation" max="26" min="-1" type="range" value="-1">
+        </TD>
     </TR>
     <TR>
         <TD CLASS='LABEL'>Volume</TD>
-        <TD id="volume"></TD>
+        <TD>
+            <SPAN id="volumeValue" style="display: inline-block; min-width: 4em">---</SPAN>
+            <INPUT id="volume" max="63" min="0" type="range" value="30">
+        </TD>
     </TR>
     <TR>
         <TD CLASS='LABEL'>Squelch</TD>
