@@ -1,5 +1,16 @@
 export const byId = (id: string) => document.getElementById(id);
 
+export const debounce = (func: () => void, timeout = 300) => {
+  let timer: number;
+  return () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this);
+    }, timeout);
+  };
+}
+
+
 export const responseToJson = async (response: Response) => {
   if (!response.ok) {
     const errorText = await response.text();
@@ -44,6 +55,19 @@ export const syncValues = (srcInputId: string, destSpanId: string) => {
     srcInput.addEventListener('input', () => {
       destSpan.textContent = srcInput.value;
     });
+  }
+}
+
+export const bandModeDisplay = (mode: number) => {
+  switch (mode) {
+  case 0:
+    return 'FM';
+  case 1:
+    return 'LSB';
+  case 2:
+    return 'USB';
+  case 3:
+    return 'AM';
   }
 }
 
