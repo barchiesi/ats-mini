@@ -1,4 +1,4 @@
-import type {Config, ConfigOptions, Memory, Status} from "./types.ts";
+import type {Config, ConfigOptions, Memory, Status, StatusOptions} from "./types.ts";
 
 const responseToJson = async (response: Response) => {
   if (!response.ok) {
@@ -16,6 +16,8 @@ const jsonFetch = (url: string, options?: RequestInit) => fetch(url, options)
   });
 
 export const statusApi = (): Promise<Status> => jsonFetch('/api/status')
+
+export const statusOptionsApi = (): Promise<StatusOptions> => jsonFetch('/api/statusOptions')
 
 export const memoriesApi = (): Promise<Memory[]> => jsonFetch('/api/memory')
 
