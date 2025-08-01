@@ -3,14 +3,14 @@ export interface Status {
   ssid: string;
   mac: string;
   version: string;
-  band: string;
+  bandIdx: number;
   freq: number;
   mode: string;
   rssi: number;
   snr: number;
   battery: number;
-  step: string;
-  bandwidth: string;
+  stepIdx: number;
+  bandwidthIdx: number;
   agc: boolean;
   attenuation?: number;
   time?: string;
@@ -64,4 +64,44 @@ export interface Config {
   themeIdx: number;
   scrollDirection: number;
   zoomMenu: boolean;
+}
+
+interface Band {
+  id: number;
+  bandName: string;
+  bandType: number;
+  bandMode: number;
+  minimumFreq: number;
+  maximumFreq: number;
+  currentFreq: number;
+  currentStepIdx: number;
+  bandwidthIdx: number;
+  bandCal: number;
+}
+
+export interface Step {
+  id: number;
+  step: number;
+  desc: string;
+  spacing: number;
+}
+
+export interface Bandwidth {
+  id: number;
+  idx: number;
+  desc: string;
+}
+
+export interface StatusOptions {
+  bands: Band[]
+  steps: {
+    fm: Step[]
+    ssb: Step[]
+    am: Step[]
+  }
+  bandwidths: {
+    fm: Bandwidth[]
+    ssb: Bandwidth[]
+    am: Bandwidth[]
+  }
 }
