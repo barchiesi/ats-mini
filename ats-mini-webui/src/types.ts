@@ -44,9 +44,35 @@ interface Theme {
   name: string;
 }
 
+interface RDSMode {
+  id: number;
+  mode: number;
+  desc: string;
+}
+
+interface FMRegion {
+  id: number;
+  value: number;
+  desc: string;
+}
+
+interface UILayout {
+  id: number;
+  name: string;
+}
+
+interface SleepMode {
+  id: number;
+  name: string;
+}
+
 export interface ConfigOptions {
+  rdsModes: RDSMode[];
   UTCOffsets: UTCOffset[];
+  fmRegions: FMRegion[];
   themes: Theme[];
+  uiLayouts: UILayout[];
+  sleepModes: SleepMode[];
 }
 
 export interface Config {
@@ -58,8 +84,14 @@ export interface Config {
   wifipass2: string;
   wifissid3: string;
   wifipass3: string;
+  brightness: number;
+  calibration: number;
+  rdsModeIdx: number;
   utcOffsetIdx: number;
+  fmRegionIdx: number;
   themeIdx: number;
-  scrollDirection: number;
+  uiLayoutIdx: number;
   zoomMenu: boolean;
+  scrollDirection: number;
+  sleepModeIdx: number;
 }
