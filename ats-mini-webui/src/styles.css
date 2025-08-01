@@ -44,3 +44,7 @@ SELECT {
 .CENTER {
     text-align: center;
 }
+
+.hidden {
+    display: none;
+}
