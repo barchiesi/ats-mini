@@ -12,7 +12,9 @@
 > * [JSON Api](https://barchiesi.github.io/ats-mini/jsonapi.html) supporting all of the above (OpenAPI 3.0 spec [here](https://barchiesi.github.io/ats-mini/_static/dot-dot/openapi-schema.yml));
 > * Static web pages generation in firmware sources replaced by a dedicated _npm_ project which simplifies development and lowers the barrier of entry for new developers;
 >
-> [Releases](https://github.com/barchiesi/ats-mini/releases) follow the same versioning as upstream with a _d_ suffix. They contain everything upstream has plus the patchset in this fork.
+> [Releases](https://github.com/barchiesi/ats-mini/releases) follow the same versioning as upstream with a _d_ suffix and a date. They contain everything upstream has plus the patchset in this fork.
+>
+> The _dev_ branch contains the latest edits to the patchset and also all unreleased upstream changes. You can download a _dev_ build by selecting the latest [workflow run](https://github.com/barchiesi/ats-mini/actions/workflows/build.yml?query=branch%3Adev).
 >
 > The intent of this patchset is to be upstreamed.
 >
