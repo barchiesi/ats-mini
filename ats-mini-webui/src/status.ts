@@ -214,6 +214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     stepSelect.addEventListener('change', () => {
       const stepIdx = parseInt(stepSelect.value);
       isPaused = false;
+      stepSelect.blur();
       fetch('/api/status', {
         method: "POST",
         headers: {
@@ -239,6 +240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     bandwidthSelect.addEventListener('change', () => {
       const bandwidthIdx = parseInt(bandwidthSelect.value);
       isPaused = false;
+      bandwidthSelect.blur();
       fetch('/api/status', {
         method: "POST",
         headers: {

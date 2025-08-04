@@ -10,7 +10,6 @@ export const debounce = (func: () => void, timeout = 300) => {
   };
 }
 
-
 export const responseToJson = async (response: Response) => {
   if (!response.ok) {
     const errorText = await response.text();
