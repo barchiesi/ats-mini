@@ -8,7 +8,7 @@
 > * All radio controls (including band, frequency, AGC/Attenuation and volume) can be changed from the web page;
 > * The memory web page automatically refreshes every 5 seconds;
 > * Memories can be tuned to from the web page;
-> * Memories can be set or cleared to from the web page;
+> * Memories can be set or cleared from the web page;
 > * All settings (excluding WiFi mode) can be changed in the config web page;
 > * [JSON Api](https://barchiesi.github.io/ats-mini/jsonapi.html) supporting all of the above (OpenAPI 3.0 spec [here](https://barchiesi.github.io/ats-mini/_static/dot-dot/openapi-schema.yml));
 > * Static web pages generation in firmware sources replaced by a dedicated _npm_ project which simplifies development and lowers the barrier of entry for new developers;
