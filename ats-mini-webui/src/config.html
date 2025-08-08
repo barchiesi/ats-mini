@@ -144,6 +144,22 @@
         </TH>
     </TR>
 </TABLE>
+<TABLE style="margin-top: 30px; margin-bottom: 30px;">
+    <TR>
+        <TH CLASS='HEADING' COLSPAN=2>Backup/restore config</TH>
+    </TR>
+    <TR>
+        <TD>
+            <p>Select a previously exported backup</p>
+            <input type="file" id="importFile"/>
+            <button id='import' disabled="disabled">Import</button>
+        </TD>
+        <TD>
+            <p>Download current config</p>
+            <button id='export'>Export</button>
+        </TD>
+    </TR>
+</TABLE>
 <script src="./config.ts" type="module"></script>
 </BODY>
 </HTML>
