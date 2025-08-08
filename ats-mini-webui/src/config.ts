@@ -2,6 +2,7 @@ import type {Config, ConfigOptions} from "./types";
 import {
   byId,
   checkboxValue,
+  downloadContent,
   inputValue,
   populateSelect,
   responseToJson,
@@ -10,6 +11,24 @@ import {
   syncValues
 } from "./utils";
 
+
+const saveConfigApi = (config: Config) => {
+  fetch('/api/config', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(config)
+  })
+    .then(responseToJson)
+    .then((updatedConfig: Config) => {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+      populateConfig(updatedConfig)
+    })
+    .catch(error => {
+      console.error('Error saving config:', error);
+    })
+}
 
 const saveConfig = () => {
   const config: Config = {
@@ -33,21 +52,7 @@ const saveConfig = () => {
     sleepModeIdx: parseInt(inputValue('sleepModes')),
   };
 
-  fetch('/api/config', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(config)
-  })
-    .then(responseToJson)
-    .then((updatedConfig: Config) => {
-      window.scrollTo({top: 0, behavior: 'smooth'});
-      populateConfig(updatedConfig)
-    })
-    .catch(error => {
-      console.error('Error saving config:', error);
-    });
+  saveConfigApi(config)
 }
 
 const populateConfig = (config: Config) => {
@@ -85,6 +90,53 @@ document.addEventListener('DOMContentLoaded', () => {
     saveButton.addEventListener('click', () => {
       saveConfig();
     });
+  }
+
+  const importButton = byId('import') as HTMLButtonElement;
+  const importFile = byId('importFile') as HTMLInputElement;
+  if (importButton && importFile) {
+    importFile.addEventListener('change', (event) => {
+      importButton.disabled = event.target?.files?.length === 0;
+    })
+
+    importButton.addEventListener('click', () => {
+      const file = (importFile.files ?? [])[0];
+
+      // Validate file existence and type
+      if (!file) {
+        console.log("No file selected. Please choose a file.", "error");
+        return;
+      }
+
+      if (file.type !== 'application/json') {
+        console.log("Unsupported file type. Please select a text file.", "error");
+        return;
+      }
+
+      // Read the file
+      const reader = new FileReader();
+      reader.onload = () => {
+        const rawJson = String(reader.result);
+        importFile.value = '';
+        saveConfigApi(JSON.parse(rawJson))
+      };
+      reader.onerror = () => {
+        console.log("Error reading the file. Please try again.", "error");
+      };
+      reader.readAsText(file);
+      return
+    })
+  }
+
+  const exportButton = byId('export');
+  if (exportButton) {
+    exportButton.addEventListener('click', () => {
+      fetch('/api/config')
+        .then(responseToJson)
+        .then((config: Config) => {
+          downloadContent(JSON.stringify(config, null, 2), `${new Date().toISOString()}_atsmini_config.json`)
+        });
+    })
   }
 
   syncValues('brightness', 'brightnessValue');
