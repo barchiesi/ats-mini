@@ -1,5 +1,14 @@
 import type {Config, ConfigOptions} from "./types";
-import {byId, checkboxValue, inputValue, populateSelect, setCheckboxValue, setInputValue, syncValues} from "./utils";
+import {
+  byId,
+  checkboxValue,
+  downloadContent,
+  inputValue,
+  populateSelect,
+  setCheckboxValue,
+  setInputValue,
+  syncValues
+} from "./utils";
 import {configApi, configOptionsApi, saveConfigApi} from "./atsminiApi.ts";
 
 
@@ -66,6 +75,55 @@ if (saveButton) {
   saveButton.addEventListener('click', () => {
     saveConfig();
   });
+}
+
+const importButton = byId('import') as HTMLButtonElement;
+const importFile = byId('importFile') as HTMLInputElement;
+if (importButton && importFile) {
+  importFile.addEventListener('change', () => {
+    importButton.disabled = importFile.files?.length === 0;
+  })
+
+  importButton.addEventListener('click', () => {
+    const file = (importFile.files ?? [])[0];
+
+    // Validate file existence and type
+    if (!file) {
+      console.log("No file selected. Please choose a file.");
+      return;
+    }
+
+    if (file.type !== 'application/json') {
+      console.log("Unsupported file type. Please select a text file.");
+      return;
+    }
+
+    // Read the file
+    const reader = new FileReader();
+    reader.onload = () => {
+      const rawJson = String(reader.result);
+      importFile.value = '';
+      saveConfigApi(JSON.parse(rawJson))
+        .then((updatedConfig: Config) => {
+          window.scrollTo({top: 0, behavior: 'smooth'});
+          populateConfig(updatedConfig)
+        })
+    };
+    reader.onerror = () => {
+      console.log("Error reading the file. Please try again.");
+    };
+    reader.readAsText(file);
+    return
+  })
+}
+
+const exportButton = byId('export');
+if (exportButton) {
+  exportButton.addEventListener('click', () => {
+    configApi().then((config: Config) => {
+      downloadContent(JSON.stringify(config, null, 2), `${new Date().toISOString()}_atsmini_config.json`)
+    });
+  })
 }
 
 syncValues('brightness', 'brightnessValue');

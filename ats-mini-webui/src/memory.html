@@ -11,7 +11,30 @@
 <P ALIGN='CENTER'>
     <A HREF='/'>Status</A>&nbsp;|&nbsp;<A HREF='/config'>Config</A>
 </P>
-<TABLE COLUMNS=2 id="memoriesTable"></TABLE>
+<TABLE style="margin-top: 30px; margin-bottom: 30px;">
+    <TR>
+        <TH CLASS='HEADING' COLSPAN=2>Backup/restore memories</TH>
+    </TR>
+    <TR>
+        <TD>
+            <p>Select a previously exported backup</p>
+            <input type="file" id="importFile"/>
+            <button id='import' disabled="disabled">Import</button>
+        </TD>
+        <TD>
+            <p>Download current memories</p>
+            <button id='export'>Export</button>
+        </TD>
+    </TR>
+</TABLE>
+<TABLE>
+    <THEAD>
+    <TR>
+        <TH CLASS='HEADING' COLSPAN=3>Memories</TH>
+    </TR>
+    </THEAD>
+    <TBODY id="memoriesTable"></TBODY>
+</TABLE>
 <script src="./memory.ts" type="module"></script>
 </BODY>
 </HTML>

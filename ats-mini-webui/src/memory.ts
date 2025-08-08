@@ -1,9 +1,10 @@
 import type {Memory, MemoryOptions, StatusOptions} from "./types";
-import {byId, formatFrequency} from "./utils";
+import {byId, downloadContent, formatFrequency} from "./utils";
 import {
   clearMemoryApi,
   memoriesApi,
   memoriesOptionsApi,
+  saveMemoriesApi,
   saveMemoryApi,
   statusOptionsApi,
   storeMemoryApi,
@@ -220,5 +221,56 @@ const fetchAndPopulateMemories = () => {
 
 const memoryOptions: MemoryOptions = await memoriesOptionsApi()
 const statusOptions: StatusOptions = await statusOptionsApi()
+
+const importButton = byId('import') as HTMLButtonElement;
+const importFile = byId('importFile') as HTMLInputElement;
+if (importButton && importFile) {
+  importFile.addEventListener('change', () => {
+    importButton.disabled = importFile.files?.length === 0;
+  })
+
+  importButton.addEventListener('click', () => {
+    const file = (importFile.files ?? [])[0];
+
+    // Validate file existence and type
+    if (!file) {
+      console.log("No file selected. Please choose a file.");
+      return;
+    }
+
+    if (file.type !== 'application/json') {
+      console.log("Unsupported file type. Please select a text file.");
+      return;
+    }
+
+    // Read the file
+    const reader = new FileReader();
+    reader.onload = () => {
+      const rawJson = String(reader.result);
+      importFile.value = '';
+
+      saveMemoriesApi(JSON.parse(rawJson))
+        .then((memories: Memory[]) => {
+          window.scrollTo({top: 0, behavior: 'smooth'});
+          populateMemories(memories);
+        })
+    };
+    reader.onerror = () => {
+      console.log("Error reading the file. Please try again.");
+    };
+    reader.readAsText(file);
+    return
+  })
+}
+
+const exportButton = byId('export');
+if (exportButton) {
+  exportButton.addEventListener('click', () => {
+    memoriesApi()
+      .then((memories: Memory[]) => {
+        downloadContent(JSON.stringify(memories, null, 2), `${new Date().toISOString()}_atsmini_memories.json`)
+      });
+  })
+}
 
 fetchAndPopulateMemories();

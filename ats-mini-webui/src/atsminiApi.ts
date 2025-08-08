@@ -8,7 +8,7 @@ const responseToJson = async (response: Response) => {
   return response.json();
 }
 
-const requestToJsonInit = (element: Partial<Status> | Memory | Config): RequestInit => ({
+const requestToJsonInit = (element: Partial<Status> | Memory | Memory[] | Config): RequestInit => ({
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -38,6 +38,8 @@ export const tuneMemoryApi = (id: number): Promise<Memory[]> => jsonFetch(`/api/
 export const storeMemoryApi = (id: number): Promise<Memory[]> => jsonFetch(`/api/memory/${id}/storeCurrent`, {method: 'POST'})
 
 export const saveMemoryApi = (memory: Memory): Promise<Memory[]> => jsonFetch(`/api/memory/${memory.id}`, requestToJsonInit(memory))
+
+export const saveMemoriesApi = (memories: Memory[]): Promise<Memory[]> => jsonFetch(`/api/memory`, requestToJsonInit(memories))
 
 export const memoriesOptionsApi = (): Promise<MemoryOptions> => jsonFetch('/api/memoryOptions')
 
