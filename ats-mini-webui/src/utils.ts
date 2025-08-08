@@ -18,6 +18,18 @@ export const responseToJson = async (response: Response) => {
   return response.json();
 }
 
+export const downloadContent = (content: string, filename: string) => {
+  const blob = new Blob([content], {
+    type: 'application/json',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 export const setCellText = (id: string, text: string) => {
   const cell = byId(id);
   if (cell) cell.textContent = text;
