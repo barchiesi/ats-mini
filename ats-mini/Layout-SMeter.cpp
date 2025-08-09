@@ -71,19 +71,6 @@ static void drawSmallScale(uint32_t freq, int y)
   spr.drawString(lim, scaleEnd+27, y, 2);
 }
 
-//
-// Draw alternative stereo indicator
-//
-static void drawAltStereoIndicator(int x, int y, bool stereo = true)
-{
-  if(stereo)
-  {
-    spr.drawCircle(x - 4, y, 7, TH.stereo_icon);
-    spr.drawCircle(x + 4, y, 7, TH.stereo_icon);
-  }
-  // Add an "else" statement here to draw a mono indicator
-}
-
 static void drawLargeSMeter(int rssi, int strength, int x, int y)
 {
   // S-Meter legend

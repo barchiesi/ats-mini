@@ -57,7 +57,7 @@ void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
   drawSMeter(getStrength(rssi), METER_OFFSET_X, METER_OFFSET_Y);
 
   // Indicate FM pilot detection (stereo indicator)
-  drawStereoIndicator(METER_OFFSET_X, METER_OFFSET_Y, (currentMode==FM) && rx.getCurrentPilot());
+  drawAltStereoIndicator(ALT_STEREO_OFFSET_X, ALT_STEREO_OFFSET_Y, (currentMode==FM) && rx.getCurrentPilot());
 
   if(currentCmd == CMD_SCAN)
   {
