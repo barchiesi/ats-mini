@@ -46,6 +46,7 @@ void drawLongStationName(const char *name, int x, int y);
 void drawStationName(const char *name, int x, int y);
 void drawSMeter(int strength, int x, int y);
 void drawStereoIndicator(int x, int y, bool stereo = true);
+void drawAltStereoIndicator(int x, int y, bool stereo = true);
 bool drawWiFiStatus(const char *statusLine1, const char *statusLine2, int x, int y);
 void drawRadioText(int y, int ymax);
 void drawScale(uint32_t freq);

@@ -333,6 +333,19 @@ void drawStereoIndicator(int x, int y, bool stereo)
   }
   // Add an "else" statement here to draw a mono indicator
 }
+//FIXME finish replacing drawStereoIndicator with drawAltStereoIndicator
+//
+// Draw alternative stereo indicator
+//
+void drawAltStereoIndicator(int x, int y, bool stereo)
+{
+  if(stereo)
+  {
+    spr.drawCircle(x - 4, y, 7, TH.stereo_icon);
+    spr.drawCircle(x + 4, y, 7, TH.stereo_icon);
+  }
+  // Add an "else" statement here to draw a mono indicator
+}
 
 //
 // Draw RDS station name (also CB channel, etc)
