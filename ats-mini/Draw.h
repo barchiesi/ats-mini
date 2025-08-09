@@ -44,7 +44,7 @@ void drawBandAndMode(const char *band, const char *mode, int x, int y);
 void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl);
 void drawLongStationName(const char *name, int x, int y);
 void drawStationName(const char *name, int x, int y);
-void drawSMeter(int strength, int x, int y);
+void drawSMeter(int strength, int snr, int x, int y);
 void drawStereoIndicator(int x, int y, bool stereo = true);
 void drawAltStereoIndicator(int x, int y, bool stereo = true);
 bool drawWiFiStatus(const char *statusLine1, const char *statusLine2, int x, int y);
