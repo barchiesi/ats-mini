@@ -305,19 +305,26 @@ void drawScale(uint32_t freq)
 }
 
 //
-// Draw S-meter
+// Draw S-meter and SN-meter
 //
-void drawSMeter(int strength, int x, int y)
+void drawSMeter(int strength, int snr, int x, int y)
 {
   spr.drawTriangle(x + 1, y + 1, x + 11, y + 1, x + 6, y + 6, TH.smeter_icon);
   spr.drawLine(x + 6, y + 1, x + 6, y + 14, TH.smeter_icon);
 
+  int snrbars = snr * 18 / 128.0;
+  for(int i=0; i<17; i++)
+    if (i<snrbars)
+      spr.fillRect(15+x + (i*4), 1+y, 2, 6, TH.smeter_bar);
+
   for(int i=0 ; i<strength ; i++)
   {
     if(i<10)
-      spr.fillRect(15+x + (i*4), 2+y, 2, 12, TH.smeter_bar);
+    {
+      spr.fillRect(15+x + (i*4), 8+y, 2, 6, TH.smeter_bar);
+    }
     else
-      spr.fillRect(15+x + (i*4), 2+y, 2, 12, TH.smeter_bar_plus);
+      spr.fillRect(15+x + (i*4), 8+y, 2, 6, TH.smeter_bar_plus);
   }
 }
 
