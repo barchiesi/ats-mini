@@ -35,6 +35,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - status
+      summary: Set ATS-Mini status
+      operationId: setStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdate'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '400':
+          description: Invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /api/statusOptions:
     get:
@@ -285,6 +315,59 @@ components:
               type: string
               description: Program type information from RDS PTY (Program Type) data (only present when available)
               example: "Rock Music"
+
+    StatusUpdate:
+      type: object
+      properties:
+        bandIdx:
+          type: number
+          description: "Band index"
+          example: 0
+        freq:
+          type: number
+          description: "Frequency to set in Hz"
+          example: 94200000
+        stepIdx:
+          type: number
+          description: "Frequency step index"
+          example: 2
+        bandwidthIdx:
+          type: number
+          description: "Bandwidth index"
+          example: 1
+        agc:
+          type: boolean
+          description: "Automatic Gain Control enable/disable"
+          example: true
+        attenuation:
+          type: integer
+          description: "Manual attenuation level (0-26 for FM, 0 for SSB, 0-36 for AM). Setting this parameter disables AGC."
+          minimum: 0
+          example: 10
+        volume:
+          type: number
+          description: "Volume level (0-63)"
+          minimum: 0
+          maximum: 63
+          example: 50
+        squelch:
+          type: number
+          description: "Squelch (0-127)"
+          minimum: 0
+          maximum: 127
+          example: 50
+        softMuteMaxAttIdx:
+          type: number
+          description: "Soft mute max attenuation (0-32)"
+          minimum: 0
+          maximum: 32
+          example: 4
+        avc:
+          type: number
+          description: "AVC (12-90)"
+          minimum: 12
+          maximum: 90
+          example: 46
 
     StatusOptions:
       type: object
