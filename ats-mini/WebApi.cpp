@@ -10,6 +10,12 @@
 #include <ArduinoJson.h>
 
 
+static inline int clamp_range(int v, int vMin, int vMax)
+{
+  v  = v>vMax? vMax : v<vMin? vMin : v;
+  return(v);
+}
+
 const String jsonStatus()
 {
   String ip = "";
@@ -99,6 +105,128 @@ const String jsonStatus()
   String json;
   serializeJson(doc, json);
   return json;
+}
+
+void jsonSetStatus(JsonDocument request)
+{
+  uint32_t prefsSave = 0;
+
+  if(request["bandIdx"].is<int>())
+  {
+    const uint bandIdx = clamp_range(request["bandIdx"], 0, getTotalBands() - 1);
+    switchBand(bandIdx);
+
+    prefsSave |= SAVE_SETTINGS;
+    prefsSave |= SAVE_BANDS;
+  }
+
+  if(request["freq"].is<int>())
+  {
+    const uint freqRead = request["freq"];
+    const uint16_t currentFrequencyRead = freqFromHz(freqRead, currentMode);
+    const int16_t currentBFORead = currentMode == FM ? 0 : bfoFromHz(freqRead);
+
+    updateFrequency(currentFrequencyRead, true);
+    if (isSSB())
+    {
+      updateBFO(currentBFORead, true);
+    }
+
+    // Clear current station name and information
+    clearStationInfo();
+    // Check for named frequencies
+    identifyFrequency(currentFrequency + currentBFO / 1000);
+
+    prefsSave |= SAVE_SETTINGS;
+    prefsSave |= SAVE_CUR_BAND;
+  }
+
+  if(request["stepIdx"].is<int>())
+  {
+    const uint newStepIdx = clamp_range(request["stepIdx"], 0, getLastStep(currentMode));
+    switchStep(newStepIdx);
+
+    prefsSave |= SAVE_CUR_BAND;
+  }
+
+  if(request["bandwidthIdx"].is<int>())
+  {
+    const uint newBdwIdx = clamp_range(request["bandwidthIdx"], 0, getLastBandwidth(currentMode));
+    switchBandwidth(newBdwIdx);
+
+    prefsSave |= SAVE_CUR_BAND;
+  }
+
+  bool setAttenuation = false;
+  if(request["agc"].is<bool>() && request["attenuation"].is<int>())
+  {
+    bool agc = request["agc"];
+    if (!agc)
+    {
+      int8_t attenuation = request["attenuation"];
+      int8_t newAgcIdx;
+      if(currentMode==FM)
+        newAgcIdx = clamp_range(attenuation, 0, 26);
+      else if(isSSB())
+        newAgcIdx = clamp_range(attenuation, 0, 0);
+      else
+        newAgcIdx = clamp_range(attenuation, 0, 36);
+
+      switchAgc(newAgcIdx + 1);
+      setAttenuation = true;
+    }
+  }
+  else if (request["agc"].is<bool>())
+  {
+    bool agc = request["agc"];
+    switchAgc(agc ? 0 : 1);
+    setAttenuation = true;
+  }
+  else if (request["attenuation"].is<int>())
+  {
+    int8_t attenuation = request["attenuation"];
+    int8_t newAgcIdx;
+    if(currentMode==FM)
+      newAgcIdx = clamp_range(attenuation, 0, 26);
+    else if(isSSB())
+      newAgcIdx = clamp_range(attenuation, 0, 0);
+    else
+      newAgcIdx = clamp_range(attenuation, 0, 36);
+
+    switchAgc(newAgcIdx + 1);
+    setAttenuation = true;
+  }
+  if (setAttenuation) prefsSave |= SAVE_SETTINGS;
+
+  if(request["volume"].is<int>())
+  {
+    volume = clamp_range(request["volume"], 0, 63);
+    if(!muteOn()) rx.setVolume(volume);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  if(request["squelch"].is<int>())
+  {
+    currentSquelch = clamp_range(request["squelch"], 0, 127);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  if(currentMode != FM && request["softMuteMaxAttIdx"].is<int>())
+  {
+    int8_t newSoftMute = clamp_range(request["softMuteMaxAttIdx"], 0, 32);
+    switchSoftMute(newSoftMute);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  if(currentMode != FM && request["avc"].is<int>())
+  {
+    int8_t newAvc = clamp_range(request["avc"], 12, 90);
+    switchAvc(newAvc);
+    prefsSave |= SAVE_SETTINGS;
+  }
+
+  // Save preferences immediately
+  prefsRequestSave(prefsSave, true);
 }
 
 const String jsonStatusOptions()
@@ -424,6 +552,20 @@ void addApiListeners(AsyncWebServer& server)
 {
   server.on("/api/status", HTTP_GET, [] (AsyncWebServerRequest *request) {
     sendJsonResponse(request, 200, jsonStatus());
+  });
+
+  server.on("/api/status", HTTP_POST,
+    [] (AsyncWebServerRequest *request) {},
+    NULL,
+    [] (AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      JsonDocument jsonRequest;
+      if (!handleChunkedJsonRequest(request, data, len, index, total, jsonRequest))
+      {
+        return; // Waiting for more chunks or error handled in the function
+      }
+
+      jsonSetStatus(jsonRequest);
+      sendJsonResponse(request, 200, jsonStatus());
   });
 
   server.on("/api/statusOptions", HTTP_GET, [] (AsyncWebServerRequest *request) {
