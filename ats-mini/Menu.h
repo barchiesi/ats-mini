@@ -117,7 +117,9 @@ int getTotalMemories();
 Band *getCurrentBand();
 uint8_t getFreqInputPos();
 int getFreqInputStep();
+int getLastStep(int mode);
 const Step *getCurrentStep(bool fast = false);
+int getLastBandwidth(int mode);
 const Bandwidth *getCurrentBandwidth();
 uint8_t getRDSMode();
 
@@ -133,15 +135,21 @@ int getTotalAmBandwidths();
 int getTotalBleModes();
 
 void doSoftMute(int dir);
+void switchSoftMute(int8_t newSoftMuteMaxAttIdx);
 void doAgc(int dir);
+void switchAgc(int8_t newAgcIdx);
 void doAvc(int dir);
+void switchAvc(int8_t newAvc);
 void doFmRegion(int dir);
 void doBandwidth(int dir);
+void switchBandwidth(uint8_t idx);
 void doVolume(int dir);
 void doBrt(int dir);
 void doCal(int dir);
 void doStep(int dir);
+void switchStep(uint8_t idx);
 void doMode(int dir);
 void doBand(int dir);
+void switchBand(int newBandIdx);
 
 #endif // MENU_H
