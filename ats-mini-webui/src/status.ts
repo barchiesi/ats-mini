@@ -1,31 +1,36 @@
 import type {Bandwidth, Status, StatusOptions, Step} from "./types";
-import {byId, formatFrequency, setCellText} from "./utils";
-import {statusApi, statusOptionsApi} from "./atsminiApi.ts";
+import {byId, debounce, formatFrequency, populateSelect, setCellText, setInputValue, syncValues} from "./utils";
+import {saveStatusApi, statusApi, statusOptionsApi} from "./atsminiApi.ts";
 
 
 const populateStatus = (status: Status) => {
-  const band = statusOptions.bands.find(b => b.id === status.bandIdx)?.name ?? 'N/A';
   const mode = statusOptions.modes.find(m => m.id === status.modeIdx)?.mode ?? 'N/A';
-  let modeSteps: Step[];
-  if (mode === "FM") {
-    modeSteps = statusOptions.steps.fm;
-  } else if (mode === "AM") {
-    modeSteps = statusOptions.steps.am;
-  } else {
-    modeSteps = statusOptions.steps.ssb;
-  }
-  const step = modeSteps.find(m => m.id === status.stepIdx)?.desc ?? 'N/A';
 
-  let modeBandwidths: Bandwidth[];
+  let steps: Step[];
   if (mode === "FM") {
-    modeBandwidths = statusOptions.bandwidths.fm;
+    steps = statusOptions.steps.fm;
   } else if (mode === "AM") {
-    modeBandwidths = statusOptions.bandwidths.am;
+    steps = statusOptions.steps.am;
   } else {
-    modeBandwidths = statusOptions.bandwidths.ssb;
+    steps = statusOptions.steps.ssb;
   }
-  const bandwidth = modeBandwidths.find(m => m.id === status.bandwidthIdx)?.desc ?? 'N/A';
+  populateSelect('steps', steps.map(b => ({
+    value: b.id.toString(),
+    label: `${b.desc}`
+  })));
 
+  let bandwidths: Bandwidth[];
+  if (mode === "FM") {
+    bandwidths = statusOptions.bandwidths.fm;
+  } else if (mode === "AM") {
+    bandwidths = statusOptions.bandwidths.am;
+  } else {
+    bandwidths = statusOptions.bandwidths.ssb;
+  }
+  populateSelect('bandwidths', bandwidths.map(b => ({
+    value: b.id.toString(),
+    label: `${b.desc}`
+  })));
 
   const ipElement = byId('ip') as HTMLAnchorElement;
   if (ipElement) {
@@ -37,27 +42,89 @@ const populateStatus = (status: Status) => {
   setCellText('ssid', status.ssid);
   setCellText('mac', status.mac);
   setCellText('version', status.version);
-  setCellText('band', band);
-  setCellText('frequency', formatFrequency(status.freq, mode));
+  setInputValue('bands', status.bandIdx.toString());
+
+  const frequencyDisplay = byId('frequencyDisplay') as HTMLSpanElement;
+  const freqSpan = byId('frequencyUnit') as HTMLSpanElement;
+  if (frequencyDisplay && freqSpan) {
+    frequencyDisplay.textContent = formatFrequency(status.freq, mode).slice(0, -3);
+    freqSpan.textContent = mode === "FM" ? `MHz` : `kHz`;
+  }
+
   setCellText('mode', mode);
   setCellText('rssi', `${status.rssi}dBuV`);
   setCellText('snr', `${status.snr}dB`);
   setCellText('battery', `${status.battery.toFixed(2)}V`);
-  setCellText('step', step);
-  setCellText('bandwidth', bandwidth);
-  setCellText('agc', status.agc ? "On" : "Off");
-  setCellText('attenuation', status.attenuation !== undefined ? String(status.attenuation).padStart(2, '0') : "N/A");
-  setCellText('volume', String(status.volume).padStart(2, '0'));
-  setCellText('squelch', status.squelch ? `${status.squelch}dBuV` : 'N/A');
-  setCellText('softMuteMaxAttIdx', status.softMuteMaxAttIdx !== undefined ? `${status.softMuteMaxAttIdx}dB` : "N/A");
-  setCellText('avc', status.avc !== undefined ? `${status.avc}dB` : "N/A");
+
+  setInputValue('steps', status.stepIdx.toString());
+  setInputValue('bandwidths', status.bandwidthIdx.toString());
+
+  const agcAttenuationInput = byId('agcAttenuation') as HTMLInputElement;
+  const agcAttenuationSpan = byId('agcAttenuationValue') as HTMLSpanElement;
+  if (agcAttenuationInput && agcAttenuationSpan) {
+    agcAttenuationInput.value = status.agc ? '-1' : (status.attenuation ?? 0).toString();
+    if (mode === "FM") {
+      agcAttenuationInput.max = '26';
+    } else if (mode in ["LSB", "USB"]) {
+      agcAttenuationInput.max = '0';
+    } else {
+      agcAttenuationInput.max = '36';
+    }
+
+    agcAttenuationSpan.textContent = status.agc ? 'AGC On' : (status.attenuation ?? 0).toString().padStart(2, '0');
+  }
+
+  setInputValue('volume', String(status.volume));
+  const volumeSpan = byId('volumeValue') as HTMLSpanElement;
+  if (volumeSpan) volumeSpan.textContent = status.volume.toString().padStart(2, '0');
+
+  const squelchInput = byId('squelch') as HTMLInputElement;
+  const squelchSpan = byId('squelchValue') as HTMLSpanElement;
+  if (squelchInput && squelchSpan) {
+    squelchInput.value = status.squelch.toString();
+    squelchSpan.textContent = status.squelch !== 0 ? `${status.squelch}dBuV` : 'Off';
+  }
+
+  const softMuteMaxAttIdxInput = byId('softMuteMaxAttIdx') as HTMLInputElement;
+  const softMuteMaxAttIdxSpan = byId('softMuteMaxAttIdxValue') as HTMLSpanElement;
+  if (softMuteMaxAttIdxInput && softMuteMaxAttIdxSpan) {
+    softMuteMaxAttIdxInput.disabled = status.softMuteMaxAttIdx === undefined;
+    if (status.softMuteMaxAttIdx !== undefined) {
+      softMuteMaxAttIdxInput.value = status.softMuteMaxAttIdx.toString();
+      softMuteMaxAttIdxSpan.textContent = `${status.softMuteMaxAttIdx}dB`;
+    } else {
+      softMuteMaxAttIdxInput.value = '0';
+      softMuteMaxAttIdxSpan.textContent = "N/A";
+    }
+  }
+
+  const avcInput = byId('avc') as HTMLInputElement;
+  const avcSpan = byId('avcValue') as HTMLSpanElement;
+  if (avcInput && avcSpan) {
+    avcInput.disabled = status.avc === undefined;
+    if (status.avc !== undefined) {
+      avcInput.value = status.avc.toString();
+      avcSpan.textContent = `${status.avc}dB`;
+    } else {
+      avcInput.value = '0';
+      avcSpan.textContent = "N/A";
+    }
+  }
+
   setCellText('piCode', status.rds?.piCode ?? "N/A");
   setCellText('stationName', status.rds?.stationName ?? "N/A");
   setCellText('radioText', status.rds?.radioText ?? "N/A");
   setCellText('programInfo', status.rds?.programInfo ?? "N/A");
 }
 
+let isPaused = false;
+
 const fetchAndPopulateStatus = () => {
+  if (isPaused) {
+    setTimeout(fetchAndPopulateStatus, 1000);
+    return
+  }
+
   statusApi()
     .then((status: Status) => {
       setTimeout(fetchAndPopulateStatus, 1000);
@@ -69,5 +136,196 @@ const fetchAndPopulateStatus = () => {
 }
 
 const statusOptions: StatusOptions = await statusOptionsApi()
+
+const bandSelect = byId('bands') as HTMLInputElement;
+if (bandSelect) {
+  bandSelect.addEventListener('change', () => {
+    const bandIdx = parseInt(bandSelect.value);
+    saveStatusApi({bandIdx})
+      .catch(error => {
+        console.error('Error updating band:', error);
+      });
+  });
+}
+
+const frequencyInput = byId('frequency') as HTMLInputElement;
+const frequencyDisplay = byId('frequencyDisplay') as HTMLInputElement;
+const frequencyEditButton = byId('frequencyEditButton') as HTMLInputElement;
+const frequencyConfirmButton = byId('frequencyConfirmButton') as HTMLInputElement;
+const frequencyCancelButton = byId('frequencyCancelButton') as HTMLInputElement;
+const frequencyUnitSpan = byId('frequencyUnit') as HTMLSpanElement;
+if (frequencyInput && frequencyDisplay && frequencyEditButton && frequencyConfirmButton && frequencyCancelButton && frequencyUnitSpan) {
+  frequencyEditButton.addEventListener('click', () => {
+    frequencyInput.value = frequencyDisplay.textContent ?? '';
+    frequencyInput.classList.remove('hidden');
+    frequencyDisplay.classList.add('hidden');
+    frequencyEditButton.classList.add('hidden');
+    frequencyConfirmButton.classList.remove('hidden');
+    frequencyCancelButton.classList.remove('hidden');
+  });
+
+  frequencyConfirmButton.addEventListener('click', () => {
+    const freq = parseFloat(frequencyInput.value) * (frequencyUnitSpan.textContent === "MHz" ? 1000 * 1000 : 1000);
+    if (isNaN(freq)) return;
+    isPaused = false;
+    saveStatusApi({freq})
+      .catch(error => {
+        console.error('Error updating frequency:', error);
+      });
+
+    frequencyInput.classList.add('hidden');
+    frequencyDisplay.classList.remove('hidden');
+    frequencyEditButton.classList.remove('hidden');
+    frequencyConfirmButton.classList.add('hidden');
+    frequencyCancelButton.classList.add('hidden');
+  });
+
+  frequencyCancelButton.addEventListener('click', () => {
+    frequencyInput.classList.add('hidden');
+    frequencyDisplay.classList.remove('hidden');
+    frequencyEditButton.classList.remove('hidden');
+    frequencyConfirmButton.classList.add('hidden');
+    frequencyCancelButton.classList.add('hidden');
+  });
+}
+
+const stepSelect = byId('steps') as HTMLInputElement;
+if (stepSelect) {
+  stepSelect.addEventListener('change', () => {
+    const stepIdx = parseInt(stepSelect.value);
+    isPaused = false;
+    stepSelect.blur();
+    saveStatusApi({stepIdx})
+      .catch(error => {
+        console.error('Error updating step:', error);
+      });
+  });
+
+  stepSelect.addEventListener('focus', () => {
+    isPaused = true;
+  });
+  stepSelect.addEventListener('blur', () => {
+    isPaused = false;
+  });
+}
+
+const bandwidthSelect = byId('bandwidths') as HTMLInputElement;
+if (bandwidthSelect) {
+  bandwidthSelect.addEventListener('change', () => {
+    const bandwidthIdx = parseInt(bandwidthSelect.value);
+    isPaused = false;
+    bandwidthSelect.blur();
+    saveStatusApi({bandwidthIdx})
+      .catch(error => {
+        console.error('Error updating bandwidth:', error);
+      });
+  });
+
+  bandwidthSelect.addEventListener('focus', () => {
+    isPaused = true;
+  });
+  bandwidthSelect.addEventListener('blur', () => {
+    isPaused = false;
+  });
+}
+
+const agcAttenuationInput = byId('agcAttenuation') as HTMLInputElement;
+const agcAttenuationSpan = byId('agcAttenuationValue') as HTMLSpanElement;
+if (agcAttenuationInput && agcAttenuationSpan) {
+  const debouncedAGCAttnChange = debounce(() => {
+    const agcAttenuation = parseInt(agcAttenuationInput.value);
+    isPaused = false;
+    saveStatusApi(agcAttenuation === -1 ? {agc: true} : {attenuation: agcAttenuation})
+      .catch(error => {
+        console.error('Error updating agc/attenuation:', error);
+      });
+  });
+
+  agcAttenuationInput.addEventListener('input', () => {
+    isPaused = true;
+    agcAttenuationSpan.textContent = agcAttenuationInput.value === '-1' ? 'AGC On' : agcAttenuationInput.value.padStart(2, '0')
+    debouncedAGCAttnChange();
+  });
+}
+
+syncValues('volume', 'volumeValue');
+const volumeInput = byId('volume') as HTMLInputElement;
+if (volumeInput) {
+  const debouncedVolumeChange = debounce(() => {
+    const volume = parseInt(volumeInput.value);
+    isPaused = false;
+    saveStatusApi({volume})
+      .catch(error => {
+        console.error('Error updating volume:', error);
+      });
+  });
+
+  volumeInput.addEventListener('input', () => {
+    isPaused = true;
+    debouncedVolumeChange();
+  });
+}
+
+const squelchInput = byId('squelch') as HTMLInputElement;
+const squelchSpan = byId('squelchValue') as HTMLSpanElement;
+if (squelchInput && squelchSpan) {
+  const debouncedSquelchChange = debounce(() => {
+    const squelch = parseInt(squelchInput.value);
+    isPaused = false;
+    saveStatusApi({squelch})
+      .catch(error => {
+        console.error('Error updating squelch:', error);
+      });
+  });
+
+  squelchInput.addEventListener('input', () => {
+    isPaused = true;
+    squelchSpan.textContent = squelchInput.value !== '0' ? `${squelchInput.value}dBuV` : 'Off';
+    debouncedSquelchChange();
+  });
+}
+
+const softMuteMaxAttIdxInput = byId('softMuteMaxAttIdx') as HTMLInputElement;
+const softMuteMaxAttIdxSpan = byId('softMuteMaxAttIdxValue') as HTMLSpanElement;
+if (softMuteMaxAttIdxInput && softMuteMaxAttIdxSpan) {
+  const debouncedSoftMuteChange = debounce(() => {
+    const softMuteMaxAttIdx = parseInt(softMuteMaxAttIdxInput.value);
+    isPaused = false;
+    saveStatusApi({softMuteMaxAttIdx})
+      .catch(error => {
+        console.error('Error updating soft mute:', error);
+      });
+  });
+
+  softMuteMaxAttIdxInput.addEventListener('input', () => {
+    isPaused = true;
+    softMuteMaxAttIdxSpan.textContent = `${softMuteMaxAttIdxInput.value}dB`;
+    debouncedSoftMuteChange();
+  });
+}
+
+const avcInput = byId('avc') as HTMLInputElement;
+const avcSpan = byId('avcValue') as HTMLSpanElement;
+if (avcInput && avcSpan) {
+  const debouncedAVCChange = debounce(() => {
+    const avc = parseInt(avcInput.value);
+    isPaused = false;
+    saveStatusApi({avc})
+      .catch(error => {
+        console.error('Error updating avc:', error);
+      });
+  });
+
+  avcInput.addEventListener('input', () => {
+    isPaused = true;
+    avcSpan.textContent = `${avcInput.value}dB`;
+    debouncedAVCChange();
+  });
+}
+
+populateSelect('bands', statusOptions.bands.map(b => ({
+  value: b.id.toString(),
+  label: `${b.name} | ${statusOptions.modes.find(m => m.id === b.modeIdx)?.mode} |  ${formatFrequency(b.minimumFreq, b.modeIdx === 0 ? "FM" : "AM", true)} - ${formatFrequency(b.maximumFreq, b.modeIdx === 0 ? "FM" : "AM", true)}`
+})));
 
 fetchAndPopulateStatus();

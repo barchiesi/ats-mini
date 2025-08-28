@@ -1,5 +1,15 @@
 export const byId = (id: string) => document.getElementById(id);
 
+export const debounce = (func: () => void, timeout = 300) => {
+  let timer: number;
+  return () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this);
+    }, timeout);
+  };
+}
+
 export const setCellText = (id: string, text: string) => {
   const cell = byId(id);
   if (cell) cell.textContent = text;
@@ -27,6 +37,16 @@ export const populateSelect = (selectId: string, options: { value: string, label
     option.textContent = i.label;
     return option;
   }))
+}
+
+export const syncValues = (srcInputId: string, destSpanId: string) => {
+  const srcInput = byId(srcInputId) as HTMLInputElement;
+  const destSpan = byId(destSpanId) as HTMLSpanElement;
+  if (srcInput && destSpan) {
+    srcInput.addEventListener('input', () => {
+      destSpan.textContent = srcInput.value;
+    });
+  }
 }
 
 export const formatFrequency = (frequencyHz: number, mode: string = "FM", noUnit = false): string => {

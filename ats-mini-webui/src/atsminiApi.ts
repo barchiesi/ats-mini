@@ -8,6 +8,14 @@ const responseToJson = async (response: Response) => {
   return response.json();
 }
 
+const requestToJsonInit = (element: Partial<Status> | Config): RequestInit => ({
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(element)
+})
+
 const jsonFetch = (url: string, options?: RequestInit) => fetch(url, options)
   .then(responseToJson)
   .catch(error => {
@@ -17,18 +25,14 @@ const jsonFetch = (url: string, options?: RequestInit) => fetch(url, options)
 
 export const statusApi = (): Promise<Status> => jsonFetch('/api/status')
 
+export const saveStatusApi = (status: Partial<Status>): Promise<Status> => jsonFetch('/api/status', requestToJsonInit(status))
+
 export const statusOptionsApi = (): Promise<StatusOptions> => jsonFetch('/api/statusOptions')
 
 export const memoriesApi = (): Promise<Memory[]> => jsonFetch('/api/memory')
 
 export const configApi = (): Promise<Config> => jsonFetch('/api/config')
 
-export const saveConfigApi = (config: Config): Promise<Config> => jsonFetch('/api/config', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(config)
-})
+export const saveConfigApi = (config: Config): Promise<Config> => jsonFetch('/api/config', requestToJsonInit(config))
 
 export const configOptionsApi = (): Promise<ConfigOptions> => jsonFetch('/api/configOptions')
