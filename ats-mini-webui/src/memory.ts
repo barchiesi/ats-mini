@@ -1,5 +1,6 @@
 import type {Memory} from "./types";
-import {byId, formatFrequency, responseToJson} from "./utils";
+import {byId, formatFrequency} from "./utils";
+import {memoriesApi} from "./atsminiApi.ts";
 
 
 const populateMemories = (memories: Memory[]) => {
@@ -30,15 +31,12 @@ const populateMemories = (memories: Memory[]) => {
 }
 
 const fetchAndPopulateMemories = () => {
-  // Fetch info from API
-  fetch('/api/memory')
-    .then(responseToJson)
+  memoriesApi()
     .then((memories: Memory[]) => {
       setTimeout(fetchAndPopulateMemories, 5000);
       populateMemories(memories);
     })
-    .catch(error => {
-      console.error('Error fetching memories:', error);
+    .catch(() => {
       setTimeout(fetchAndPopulateMemories, 5000);
     });
 }

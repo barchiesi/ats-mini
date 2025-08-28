@@ -1,13 +1,6 @@
 import type {Config, ConfigOptions} from "./types";
-import {
-  byId,
-  checkboxValue,
-  inputValue,
-  populateSelect,
-  responseToJson,
-  setCheckboxValue,
-  setInputValue
-} from "./utils";
+import {byId, checkboxValue, inputValue, populateSelect, setCheckboxValue, setInputValue} from "./utils";
+import {configApi, configOptionsApi, saveConfigApi} from "./atsminiApi.ts";
 
 
 const saveConfig = () => {
@@ -26,21 +19,11 @@ const saveConfig = () => {
     zoomMenu: checkboxValue('zoom'),
   };
 
-  fetch('/api/config', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(config)
-  })
-    .then(responseToJson)
+  saveConfigApi(config)
     .then((updatedConfig: Config) => {
       window.scrollTo({top: 0, behavior: 'smooth'});
       populateConfig(updatedConfig)
     })
-    .catch(error => {
-      console.error('Error saving config:', error);
-    });
 }
 
 const populateConfig = (config: Config) => {
@@ -65,12 +48,7 @@ if (saveButton) {
   });
 }
 
-Promise.all([
-  fetch('/api/configOptions')
-    .then(responseToJson),
-  fetch('/api/config')
-    .then(responseToJson),
-])
+Promise.all([configOptionsApi(), configApi()])
   .then(([configOptions, config]: [ConfigOptions, Config]) => {
     populateSelect('utcoffset', configOptions.UTCOffsets.map(o => ({
       value: o.id.toString(),
@@ -79,6 +57,3 @@ Promise.all([
     populateSelect('theme', configOptions.themes.map(t => ({value: t.id.toString(), label: t.name})));
     populateConfig(config);
   })
-  .catch(error => {
-    console.error('Error fetching config:', error);
-  });

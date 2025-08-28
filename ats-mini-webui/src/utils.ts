@@ -1,13 +1,5 @@
 export const byId = (id: string) => document.getElementById(id);
 
-export const responseToJson = async (response: Response) => {
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`HTTP error status: ${response.status}, body: ${errorText}`);
-  }
-  return response.json();
-}
-
 export const setCellText = (id: string, text: string) => {
   const cell = byId(id);
   if (cell) cell.textContent = text;

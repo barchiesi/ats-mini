@@ -1,5 +1,6 @@
 import type {Status} from "./types";
-import {byId, formatFrequency, responseToJson, setCellText} from "./utils";
+import {byId, formatFrequency, setCellText} from "./utils";
+import {statusApi} from "./atsminiApi.ts";
 
 
 const populateStatus = (status: Status) => {
@@ -20,15 +21,12 @@ const populateStatus = (status: Status) => {
 }
 
 const fetchAndPopulateStatus = () => {
-  // Fetch status from API
-  fetch('/api/status')
-    .then(responseToJson)
+  statusApi()
     .then((status: Status) => {
       setTimeout(fetchAndPopulateStatus, 1000);
       populateStatus(status);
     })
-    .catch(error => {
-      console.error('Error fetching status:', error);
+    .catch(() => {
       setTimeout(fetchAndPopulateStatus, 1000);
     });
 }
